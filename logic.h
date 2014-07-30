@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdint.h>
 
 #include <vector>
@@ -47,8 +49,8 @@ namespace piecemeal {
     };
 
     template <class T, size_t N>
-    bool check_distinct(const isa<T,N>& distinct, const isa<T,N>& target) {
-      for (size_t i = 0; i < distinct.size() && i < target.size(); i++) {
+    bool check_distinct(const array<T,N>& distinct, const isa<T,N>& target) {
+      for (size_t i = 0; i < target.size(); i++) {
         if (distinct[i] < target.size()
           && target[distinct[i]] == target[i]) return false;
       }
@@ -88,7 +90,7 @@ namespace piecemeal {
     struct rule {
       term<T,N> head;
       vector<term<T,N>> positives, negatives;
-      vector<isa<T,N>> distincts;
+      vector<array<T,N>> distincts;
     };
 
     template <class T, size_t N>
