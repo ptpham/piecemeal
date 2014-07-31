@@ -8,6 +8,7 @@ namespace piecemeal {
     using namespace std;
 
     template <class T> struct elem : vector<shared_ptr<elem<T>>> { T value; };
+    template <class T> using cnode = shared_ptr<const elem<T>>;
     template <class T> using node = shared_ptr<elem<T>>;
 
     template <class T>
@@ -26,8 +27,8 @@ namespace piecemeal {
   namespace dag {
     namespace traverse {
       template <class T, class F>
-      void depth(dag::node<T> node, F fn) {
-        vector<decltype(node)> stack;
+      void depth(T node, F fn) {
+        vector<T> stack;
         stack.reserve(128);
         stack.push_back(node);
         while (stack.size() > 0) {
@@ -39,7 +40,7 @@ namespace piecemeal {
       }
 
       template <class T, class F>
-      void breadth(dag::node<T> node, F fn) {
+      void breadth(T node, F fn) {
         vector<decltype(node)> cur, next;
         next.reserve(128);
         cur.reserve(128);
@@ -48,7 +49,7 @@ namespace piecemeal {
         while (cur.size() > 0) {
           for (auto child : cur) {
             fn(child);
-            for (auto grandchild : child) {
+            for (auto grandchild : *child) {
               next.push_back(grandchild);
             }
           }
@@ -59,5 +60,22 @@ namespace piecemeal {
     }
   }
 }
+
+namespace piecemeal {
+  namespace dag {
+    namespace gather {
+      template <class T>
+      auto leaves(T node) {
+        vector<T> result;
+        traverse::breadth(node, [&](T child) {
+          if (child->size() > 0) return;
+          result.push_back(child);
+        });
+        return result;
+      }
+    }
+  }
+}
+
 
 

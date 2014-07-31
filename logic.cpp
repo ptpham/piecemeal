@@ -23,7 +23,7 @@ namespace piecemeal {
 
       for (auto& rule : ruleset[query.id()]) {
         auto& head = rule.head;
-        auto space = transfer(head.pull.shadow(), head.pull, head.value);
+        auto space = transfer(head.pull.shadow(), head.pull, head.literal);
         function<void (decltype(space),size_t)> satisfy =
           [&](decltype(space) current, size_t i) {
           if (!current.valid()) return;
@@ -33,13 +33,13 @@ namespace piecemeal {
               if (!check_distinct(distinct, current)) return;
             }
             for (auto& negative : rule.negatives) {
-              auto next = transfer(negative.value, negative.push, current);
+              auto next = transfer(negative.literal, negative.push, current);
               if (ask(ruleset, next, state).size() > 0) return;
             }
-            result.emplace(transfer(head.value, head.push, current));
+            result.emplace(transfer(head.literal, head.push, current));
           } else {
             auto& positive = rule.positives[i];
-            auto next = transfer(positive.value, positive.push, current);
+            auto next = transfer(positive.literal, positive.push, current);
             for (auto& entry : ask(ruleset, next, state)) {
               satisfy(transfer(current, positive.pull, entry), i + 1);
             }

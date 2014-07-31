@@ -10,43 +10,12 @@
 #include <unordered_map>
 
 #include "hashes.h"
+#include "stdaux.h"
+#include "isa.h"
 
 namespace piecemeal {
   namespace logic {
     using namespace std;
-
-    template <class T, size_t N>
-    struct isa : array<T,N> {
-      isa() : array<T,N>({0, 0}) { }
-      isa(T id, T size) : array<T,N>({id, size}) { }
-      isa(T id, const initializer_list<T>& list) :array<T,N>({id,(T)list.size()}) {
-        T i = 0; for (auto& t : list) (*this)[i++] = t;
-      }
-
-      static T empty() { return numeric_limits<T>::max(); }
-      static isa null() { return isa(empty(), 0); }
-
-      isa frame() const { return isa(id(), size()); }
-      isa shadow() const { return frame().fill(empty()); }
-      isa clone() const { isa result = *this; return result; }
-      isa& fill(T value) { for (auto& v: *this) v = value; return *this; }
-      T& operator[](size_t i) { return array<T,N>::operator[](i+2); }
-      T& id() { return array<T,N>::operator[](0); }
-
-      T* begin() { return &array<T,N>::operator[](2); }
-      T* end() { return begin() + size(); }
-
-      bool valid() const { return this->id() != empty(); }
-
-      const T& operator[](size_t i) const { return array<T,N>::operator[](i+2); }
-      const T& size() const { return array<T,N>::operator[](1); }
-      const T& id() const { return array<T,N>::operator[](0); }
-
-      const T* begin() const { return &array<T,N>::operator[](2); }
-      const T* end() const { return begin() + size(); }
-
-      static constexpr size_t extent = N - 2;
-    };
 
     template <class T, size_t N>
     bool check_distinct(const array<T,N>& distinct, const isa<T,N>& target) {
@@ -79,11 +48,27 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
+    auto invert(const isa<T,N>& trans) {
+      auto empty = isa<T,N>::empty();
+      auto size = *stdaux::max_element_nullable(
+        trans.begin(), trans.end(), empty);
+      if (size == empty) return trans;
+      auto result = isa<T,N>(trans.id(), size).shade();
+      for (T i = 0; i < trans.size(); i++) {
+        if (trans[i] != empty) result[trans[i]] = i;
+      }
+      return result;
+    }
+
+    template <class T, size_t N>
     struct term {
-      isa<T,N> value, push, pull;
+      isa<T,N> literal, push, pull;
 
       term() { }
-      term(const isa<T,N>& a) : value(a), push(a.shadow()), pull(a.shadow()) { }
+      term(const isa<T,N>& a) : literal(a),
+        push(isa<T,N>::null()), pull(isa<T,N>::null()) { }
+      term(const isa<T,N>& a, const isa<T,N>& push, const isa<T,N>& pull) :
+        literal(a), push(push), pull(pull) { }
     };
 
     template <class T, size_t N>
@@ -109,8 +94,8 @@ namespace piecemeal {
 
 namespace std {
   template <class T, size_t N>
-  struct hash<piecemeal::logic::isa<T,N>> {
-    size_t operator() (const piecemeal::logic::isa<T,N>& a) const {
+  struct hash<piecemeal::isa<T,N>> {
+    size_t operator() (const piecemeal::isa<T,N>& a) const {
       return piecemeal::hashes::sdbm(&a.id(), &a[a.size()]);
     }
   };
