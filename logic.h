@@ -66,7 +66,7 @@ namespace piecemeal {
 
       term() { }
       term(const isa<T,N>& a) : literal(a),
-        push(isa<T,N>::null()), pull(isa<T,N>::null()) { }
+        push(isa<T,N>(a.id(),0)), pull(isa<T,N>(a.id(),0)) { }
       term(const isa<T,N>& a, const isa<T,N>& push, const isa<T,N>& pull) :
         literal(a), push(push), pull(pull) { }
     };
