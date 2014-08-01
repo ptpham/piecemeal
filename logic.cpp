@@ -14,7 +14,14 @@ namespace piecemeal {
     const unordered_set<isa<T,N>>& ask(const vector<vector<rule<T,N>>>& ruleset,
       const isa<T,N>& query, askstate<T,N>& state) {
       static const unordered_set<isa<T,N>>& empty = {};
+      static const unordered_set<isa<T,N>>& identity = { isa<T,N>::null() };
       if (!query.valid()) return empty;
+      
+      if (is_grounded(query)) {
+        auto& known = state.known;
+        if (known.find(query) != known.end()) return identity;
+        if (state.completed.contains(query.id())) return empty;
+      }
 
       auto& index = state.index;
       auto found = index.find(query);
@@ -36,7 +43,10 @@ namespace piecemeal {
               auto next = transfer(negative.literal, negative.push, current);
               if (ask(ruleset, next, state).size() > 0) return;
             }
-            result.emplace(transfer(head.literal, head.push, current));
+
+            auto proposition = transfer(head.literal, head.push, current);
+            state.known.emplace(proposition);
+            result.emplace(proposition);
           } else {
             auto& positive = rule.positives[i];
             auto next = transfer(positive.literal, positive.push, current);
@@ -47,6 +57,8 @@ namespace piecemeal {
         };
         satisfy(space, 0);
       }
+
+      if (is_blank(query)) state.completed.set(query.id(), true);
       return result;
     }
 

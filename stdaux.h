@@ -1,4 +1,7 @@
 
+#pragma once
+
+#include <vector>
 
 namespace piecemeal {
   namespace stdaux {
@@ -20,6 +23,14 @@ namespace piecemeal {
       }
       return largest;
     }
+
+    struct bitvector : vector<bool> {
+      bool contains(size_t i) const { return size() <= i ? false : at(i); }
+      void set(size_t i, bool truth) {
+        if (i >= size()) resize(i+1);
+        at(i) = truth;
+      }
+    };
   }
 }
 

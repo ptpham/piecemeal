@@ -27,8 +27,13 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    bool grounded(const isa<T,N>& a) {
+    bool is_grounded(const isa<T,N>& a) {
       for (auto v : a) { if (v == isa<T,N>::empty()) return false; } return true;
+    }
+
+    template <class T, size_t N>
+    bool is_blank(const isa<T,N>& a) {
+      for (auto v : a) { if (v != isa<T,N>::empty()) return false; } return true;
     }
 
     template <class T, size_t N>
@@ -38,7 +43,7 @@ namespace piecemeal {
       T size = min(trans.size(), result.size());
       for (size_t i = 0; i < size; i++) {
         auto j = trans[i];
-        if (j == isa<T,N>::empty()) continue;
+        if (j == isa<T,N>::empty() || j > src.size()) continue;
         if (result[i] != isa<T,N>::empty() && result[i] != src[j]) {
           return isa<T,N>::null();
         }
@@ -81,9 +86,9 @@ namespace piecemeal {
     template <class T, size_t N>
     struct askstate {
       typedef unordered_map<isa<T,N>, unordered_set<isa<T,N>>> query_index;
-      typedef vector<unordered_set<isa<T,N>>> knowledge;
+      unordered_set<isa<T,N>> known;
+      stdaux::bitvector completed;
       query_index index;
-      knowledge known;
     };
 
     template <class T, size_t N>
