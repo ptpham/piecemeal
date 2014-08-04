@@ -27,6 +27,7 @@ namespace piecemeal {
       auto found = index.find(query);
       if (found != index.end()) return found->second;
       unordered_set<isa<T,N>>& result = index[query];
+      if (query.id() >= ruleset.size()) return empty;
 
       for (auto& rule : ruleset[query.id()]) {
         auto& head = rule.head;

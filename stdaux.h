@@ -24,6 +24,13 @@ namespace piecemeal {
       return largest;
     }
 
+    template <class I, class F>
+    auto max_extraction(I begin, I end, F converter) {
+      return converter(*std::max_element(begin, end, [&](auto i, auto j) {
+        return converter(i) < converter(j);
+      }));
+    }
+
     struct bitvector : vector<bool> {
       bool contains(size_t i) const { return size() <= i ? false : at(i); }
       void set(size_t i, bool truth) {

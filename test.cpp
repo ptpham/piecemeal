@@ -9,6 +9,18 @@ using namespace std;
 using namespace piecemeal;
 using namespace piecemeal::logic;
 
+template <class T, size_t N>
+ostream& operator << (ostream& out, isa<T,N>& a) {
+  out << (int)a.id() << ":";
+  for (int v : a) cout << " " << v;
+  return out;
+}
+
+template <class T, size_t N>
+ostream& operator << (ostream& out, term<T,N>& t) {
+  return out << t.literal << " <- " << t.push << " -> " << t.pull;
+}
+
 template <class U, class V = size_t>
 struct unordered_dimap {
   vector<U> backward;
@@ -19,6 +31,7 @@ struct unordered_dimap {
     if (found != forward.end()) return found->second;
     V result = backward.size();
     forward.insert(found, {s, result});
+    backward.push_back(s);
     return result;
   }
 };
@@ -29,6 +42,7 @@ namespace kif {
   template <class T, size_t N>
   struct scope {
     unordered_dimap<string> tokens;
+    unordered_set<isa<T,N>> known;
     vector<rule<T,N>> rules;
   };
 
@@ -42,7 +56,7 @@ namespace kif {
     auto id = tokens.at(leaves[0]->value);
     auto result = isa<T,N>(id, leaves.size() - 1).shade();
     for (size_t i = 1; i < leaves.size(); i++) {
-      if (!is_var(leaves[i])) result[i - 1] = tokens.at(leaves[i]->value);
+      if (!is_var(leaves[i])) result[i-1] = tokens.at(leaves[i]->value);
     };
     return result;
   }
@@ -65,6 +79,7 @@ namespace kif {
     auto leaves = dag::gather::leaves(node);
     auto head = extract_literal<T,N>(tokens, leaves);
     auto push = extract_push<T,N>(vars.forward, leaves);
+    push.id() = head.id();
     return term<T,N>(head, push, logic::invert(push));
   }
 
@@ -85,6 +100,7 @@ namespace kif {
     scope<T,N> result;
     for (auto& child : *root) {
       if (child->size() == 0) continue;
+      rule<T,N> rule;
 
       // Find and index all variables for a consistent ordering
       unordered_dimap<string> vars;
@@ -93,13 +109,16 @@ namespace kif {
       });
 
       // Relations and propositions will not start with the leading '<='
-      bool full_rule = child->size() > 1 && child->at(0)->value == "<=";
-      auto head_node = full_rule ? child->at(1) : child;
-      rule<T,N> rule;
+      if (child->size() == 1 || child->at(0)->value != "<=") {
+        dag::cnode<string> const_child = child;
+        auto leaves = dag::gather::leaves(const_child);
+        result.known.emplace(extract_literal<T,N>(result.tokens, leaves));
+        continue;
+      }
 
-      // Extract head and various body terms
-      rule.head = extract_term<T,N>(result.tokens, vars, head_node);
-      for (size_t i = 1; i < child->size(); i++) {
+      // Extract head and various body terms for full rules
+      rule.head = extract_term<T,N>(result.tokens, vars, child->at(1));
+      for (size_t i = 2; i < child->size(); i++) {
         auto term = child->at(i);
 
         // Handle distinct terms
@@ -125,25 +144,23 @@ namespace kif {
 
 int main(int nargs, char** argv) {
 
-  string raw_string = "(hello) ( \t <= blarg) \n ( <= (blarg) (bloop ?x ?y) )";
-  //((hello) (<= blarg) (<= (blarg) (bloop ?x ?y)))
+  string raw_string = "(<= (q ?x) (p ?x)) (<= (p ?y) (r ?y)) (r bloop)";
   auto parsed = dag::loads(raw_string);
-  cout << dag::dumps(parsed);
-  kif::parse<uint16_t, 16>(parsed);
-  cout << endl;
+  cout << dag::dumps(parsed) << endl;
+  auto scope = kif::parse<uint8_t, 16>(parsed);
 
-  isa<uint8_t,16> q0 = {0, {0}};
-  decltype(q0) q1 = {1, {0}};
-  decltype(q0) q2 = {2, {0}};
-
-  rule<uint8_t, 16> r0 = { q0, { q1 } };
-  decltype(r0) r1 = { q1, { q2 } };
-  decltype(r0) r2 = { q2 };
+  for (auto rule : scope.rules) {
+    cout << rule.head << endl;
+    for (auto term : rule.positives) cout << "\t" << term << endl;
+  }
 
   askstate<uint8_t, 16> state;
-  vector<vector<decltype(r0)>> ruleset = { {r0}, {r1}, {r2} };
-  auto proved = ask(ruleset, q0, state);
-  cout << "Proved " << state.index.size() << " proposition(s)." << endl;
+  state.known = scope.known;
+  
+  auto ruleset = logic::index_by_head_id(scope.rules);
+  cout << "Ruleset size: " << ruleset.size() << endl;
+  auto proved = ask(ruleset,scope.rules[0].head.literal, state);
+  cout << "Proved " << state.known.size() << " proposition(s)." << endl;
   return 0;
 }
 

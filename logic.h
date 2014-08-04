@@ -58,7 +58,7 @@ namespace piecemeal {
       auto size = *stdaux::max_element_nullable(
         trans.begin(), trans.end(), empty);
       if (size == empty) return trans;
-      auto result = isa<T,N>(trans.id(), size).shade();
+      auto result = trans.frame().shade();
       for (T i = 0; i < trans.size(); i++) {
         if (trans[i] != empty) result[trans[i]] = i;
       }
@@ -94,6 +94,15 @@ namespace piecemeal {
     template <class T, size_t N>
     const unordered_set<isa<T,N>>& ask(const vector<vector<rule<T,N>>>& ruleset,
       const isa<T,N>& query, askstate<T,N>& state);
+
+    template <class T, size_t N>
+    vector<vector<rule<T,N>>> index_by_head_id(const vector<rule<T,N>>& rules) {
+      auto size = stdaux::max_extraction(rules.begin(), rules.end(), 
+        [] (auto& rule) { return rule.head.literal.id(); }) + 1;
+      vector<vector<rule<T,N>>> result(size);
+      for (auto& rule : rules) result[rule.head.literal.id()].push_back(rule);
+      return result; 
+    }
   }
 }
 
