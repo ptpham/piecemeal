@@ -11,14 +11,19 @@
 
 #include "hashes.h"
 #include "stdaux.h"
-#include "isa.h"
 
 namespace piecemeal {
   namespace logic {
     using namespace std;
 
     template <class T, size_t N>
-    bool check_distinct(const array<T,N>& distinct, const isa<T,N>& target) {
+    T empty() { return numeric_limits<T>::max(); }
+
+    template <class T, size_t N>
+    array<T,N> empty_array() { return stdaux::filled_array<T,N>(empty<T,N>());}
+
+    template <class T, size_t N>
+    bool check_distinct(const array<T,N>& distinct, const array<T,N>& target) {
       for (size_t i = 0; i < target.size(); i++) {
         if (distinct[i] < target.size()
           && target[distinct[i]] == target[i]) return false;
@@ -27,25 +32,25 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    bool is_grounded(const isa<T,N>& a) {
-      for (auto v : a) { if (v == isa<T,N>::empty()) return false; } return true;
+    bool is_grounded(const array<T,N>& a) {
+      for (auto v : a) { if (v == empty<T,N>()) return false; } return true;
     }
 
     template <class T, size_t N>
-    bool is_blank(const isa<T,N>& a) {
-      for (auto v : a) { if (v != isa<T,N>::empty()) return false; } return true;
+    bool is_blank(const array<T,N>& a) {
+      for (auto v : a) { if (v != empty<T,N>()) return false; } return true;
     }
 
     template <class T, size_t N>
-    isa<T,N> transfer(const isa<T,N>& dst,
-      const isa<T,N>& trans, const isa<T,N>& src) {
-      auto result = dst.clone();
-      T size = min(trans.size(), result.size());
-      for (size_t i = 0; i < size; i++) {
+    array<T,N> transfer(const array<T,N>& dst,
+      const array<T,N>& trans, const array<T,N>& src) {
+      auto result = dst;
+
+      for (size_t i = 0; i < N; i++) {
         auto j = trans[i];
-        if (j == isa<T,N>::empty() || j > src.size()) continue;
-        if (result[i] != isa<T,N>::empty() && result[i] != src[j]) {
-          return isa<T,N>::null();
+        if (j == empty<T,N>() || j > src.size()) continue;
+        if (result[i] != empty<T,N>() && result[i] != src[j]) {
+          return empty_array<T,N>();
         }
         result[i] = src[j];
       }
@@ -53,26 +58,25 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    auto invert(const isa<T,N>& trans) {
-      auto empty = isa<T,N>::empty();
+    auto invert(const array<T,N>& trans) {
       auto size = *stdaux::max_element_nullable(
-        trans.begin(), trans.end(), empty);
-      if (size == empty) return trans;
-      auto result = trans.frame().shade();
+        trans.begin(), trans.end(), empty<T,N>());
+      if (size == empty<T,N>()) return trans;
+      auto result = empty_array<T,N>();
       for (T i = 0; i < trans.size(); i++) {
-        if (trans[i] != empty) result[trans[i]] = i;
+        if (trans[i] != empty<T,N>()) result[trans[i]] = i;
       }
       return result;
     }
 
     template <class T, size_t N>
     struct term {
-      isa<T,N> literal, push, pull;
+      array<T,N> literal, push, pull;
 
       term() { }
-      term(const isa<T,N>& a) : literal(a),
-        push(isa<T,N>(a.id(),0)), pull(isa<T,N>(a.id(),0)) { }
-      term(const isa<T,N>& a, const isa<T,N>& push, const isa<T,N>& pull) :
+      term(const array<T,N>& a) : literal(a),
+        push(array<T,N>(a.id(),0)), pull(array<T,N>(a.id(),0)) { }
+      term(const array<T,N>& a, const array<T,N>& push, const array<T,N>& pull) :
         literal(a), push(push), pull(pull) { }
     };
 
@@ -85,22 +89,23 @@ namespace piecemeal {
 
     template <class T, size_t N>
     struct askstate {
-      typedef unordered_map<isa<T,N>, unordered_set<isa<T,N>>> query_index;
-      unordered_set<isa<T,N>> known;
+      typedef unordered_map<array<T,N>, unordered_set<array<T,N>>> query_index;
+      unordered_set<array<T,N>> known;
       stdaux::bitvector completed;
       query_index index;
     };
 
     template <class T, size_t N>
-    const unordered_set<isa<T,N>>& ask(const vector<vector<rule<T,N>>>& ruleset,
-      const isa<T,N>& query, askstate<T,N>& state);
+    const unordered_set<array<T,N>>& ask(const vector<vector<rule<T,N>>>& ruleset,
+      const array<T,N>& query, askstate<T,N>& state);
 
     template <class T, size_t N>
-    vector<vector<rule<T,N>>> index_by_head_id(const vector<rule<T,N>>& rules) {
+    vector<vector<rule<T,N>>> index_by_position(
+      const vector<rule<T,N>>& rules, int pos = 0) {
       auto size = stdaux::max_extraction(rules.begin(), rules.end(), 
-        [] (auto& rule) { return rule.head.literal.id(); }) + 1;
+        [=] (auto& rule) { return rule.head.literal[pos]; }) + 1;
       vector<vector<rule<T,N>>> result(size);
-      for (auto& rule : rules) result[rule.head.literal.id()].push_back(rule);
+      for (auto& rule : rules) result[rule.head.literal[pos]].push_back(rule);
       return result; 
     }
   }
@@ -108,9 +113,9 @@ namespace piecemeal {
 
 namespace std {
   template <class T, size_t N>
-  struct hash<piecemeal::isa<T,N>> {
-    size_t operator() (const piecemeal::isa<T,N>& a) const {
-      return piecemeal::hashes::sdbm(&a.id(), &a[a.size()]);
+  struct hash<array<T,N>> {
+    size_t operator() (const array<T,N>& a) const {
+      return piecemeal::hashes::sdbm(a.begin(), a.end());
     }
   };
 }

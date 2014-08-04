@@ -10,8 +10,7 @@ using namespace piecemeal;
 using namespace piecemeal::logic;
 
 template <class T, size_t N>
-ostream& operator << (ostream& out, isa<T,N>& a) {
-  out << (int)a.id() << ":";
+ostream& operator << (ostream& out, array<T,N>& a) {
   for (int v : a) cout << " " << v;
   return out;
 }
@@ -42,7 +41,7 @@ namespace kif {
   template <class T, size_t N>
   struct scope {
     unordered_dimap<string> tokens;
-    unordered_set<isa<T,N>> known;
+    unordered_set<array<T,N>> known;
     vector<rule<T,N>> rules;
   };
 
@@ -53,10 +52,9 @@ namespace kif {
   template <class T, size_t N>
   auto extract_literal(unordered_dimap<string>& tokens,
     const vector<dag::cnode<string>>& leaves) {
-    auto id = tokens.at(leaves[0]->value);
-    auto result = isa<T,N>(id, leaves.size() - 1).shade();
-    for (size_t i = 1; i < leaves.size(); i++) {
-      if (!is_var(leaves[i])) result[i-1] = tokens.at(leaves[i]->value);
+    auto result = logic::empty_array<T,N>();
+    for (size_t i = 0; i < leaves.size(); i++) {
+      if (!is_var(leaves[i])) result[i] = tokens.at(leaves[i]->value);
     };
     return result;
   }
@@ -64,11 +62,11 @@ namespace kif {
   template <class T, size_t N>
   auto extract_push(const unordered_map<string,size_t>& vars,
     const vector<dag::cnode<string>>& leaves) {
-    auto result = isa<T,N>::null(leaves.size()-1).shade();
-    for (size_t i = 1; i < leaves.size(); i++) {
+    auto result = logic::empty_array<T,N>();
+    for (size_t i = 0; i < leaves.size(); i++) {
       auto found = vars.find(leaves[i]->value);
       if (found == vars.end()) continue;
-      result[i-1] = found->second;
+      result[i] = found->second;
     }
     return result;
   }
@@ -79,7 +77,6 @@ namespace kif {
     auto leaves = dag::gather::leaves(node);
     auto head = extract_literal<T,N>(tokens, leaves);
     auto push = extract_push<T,N>(vars.forward, leaves);
-    push.id() = head.id();
     return term<T,N>(head, push, logic::invert(push));
   }
 
@@ -87,7 +84,7 @@ namespace kif {
   auto extract_distinct(unordered_dimap<string>& vars,
     dag::cnode<string> node) {
     array<T,N> result;
-    fill(result.begin(), result.end(), isa<T,N>::empty());
+    fill(result.begin(), result.end(), logic::empty<T,N>());
 
     auto first = node->at(1);
     auto second = node->at(2);
@@ -157,7 +154,7 @@ int main(int nargs, char** argv) {
   askstate<uint8_t, 16> state;
   state.known = scope.known;
   
-  auto ruleset = logic::index_by_head_id(scope.rules);
+  auto ruleset = logic::index_by_position(scope.rules);
   cout << "Ruleset size: " << ruleset.size() << endl;
   auto proved = ask(ruleset,scope.rules[0].head.literal, state);
   cout << "Proved " << state.known.size() << " proposition(s)." << endl;

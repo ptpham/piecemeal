@@ -11,30 +11,31 @@ namespace piecemeal {
     };
 
     template <class T, size_t N>
-    const unordered_set<isa<T,N>>& ask(const vector<vector<rule<T,N>>>& ruleset,
-      const isa<T,N>& query, askstate<T,N>& state) {
-      static const unordered_set<isa<T,N>>& empty = {};
-      static const unordered_set<isa<T,N>>& identity = { isa<T,N>::null() };
-      if (!query.valid()) return empty;
+    const unordered_set<array<T,N>>& ask(const vector<vector<rule<T,N>>>& ruleset,
+      const array<T,N>& query, askstate<T,N>& state) {
+      static const unordered_set<array<T,N>>& empty = {};
+      static const unordered_set<array<T,N>>& identity =
+        { logic::empty_array<T,N>() };
+      if (is_blank(query)) return empty;
       
       if (is_grounded(query)) {
         auto& known = state.known;
         if (known.find(query) != known.end()) return identity;
-        if (state.completed.contains(query.id())) return empty;
+        if (state.completed.contains(query[0])) return empty;
       }
 
       auto& index = state.index;
       auto found = index.find(query);
       if (found != index.end()) return found->second;
-      unordered_set<isa<T,N>>& result = index[query];
-      if (query.id() >= ruleset.size()) return empty;
+      unordered_set<array<T,N>>& result = index[query];
+      if (query[0] >= ruleset.size()) return empty;
 
-      for (auto& rule : ruleset[query.id()]) {
+      for (auto& rule : ruleset[query[0]]) {
         auto& head = rule.head;
-        auto space = transfer(head.pull.shadow(), head.pull, head.literal);
+        auto space = logic::empty_array<T,N>();
         function<void (decltype(space),size_t)> satisfy =
           [&](decltype(space) current, size_t i) {
-          if (!current.valid()) return;
+          if (is_blank(current)) return;
 
           if (i == rule.positives.size()) {
             for (auto& distinct : rule.distincts) {
@@ -59,13 +60,13 @@ namespace piecemeal {
         satisfy(space, 0);
       }
 
-      if (is_blank(query)) state.completed.set(query.id(), true);
+      if (is_blank(query)) state.completed.set(query[0], true);
       return result;
     }
 
-    template const unordered_set<isa<uint8_t,16>>& ask(
+    template const unordered_set<array<uint8_t,16>>& ask(
       const vector<vector<rule<uint8_t,16>>>& ruleset,
-      const isa<uint8_t,16>& query, askstate<uint8_t,16>& state);
+      const array<uint8_t,16>& query, askstate<uint8_t,16>& state);
   }
 }
 
