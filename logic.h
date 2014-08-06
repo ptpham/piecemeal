@@ -137,8 +137,8 @@ namespace piecemeal {
     template <class T, size_t N>
     using askstate = unordered_map<array<T,N>, unordered_set<array<T,N>>>;
 
-    template <class T, size_t N>
-    const unordered_set<array<T,N>>& ask(const prefix_index<T,N>& index,
+    template <class I, class T, size_t N>
+    const unordered_set<array<T,N>>& ask(const I& index,
       const array<T,N>& query, askstate<T,N>& state);
   }
 }

@@ -3,9 +3,29 @@
 
 #include <vector>
 
+namespace std {
+  template <class T> T begin(const pair<T,T>& p) { return p.first; }
+  template <class T> T end(const pair<T,T>& p) { return p.second; }
+};
+
 namespace piecemeal {
   namespace stdaux {
     using namespace std;
+
+    template <class U, class V = size_t>
+    struct unordered_dimap {
+      vector<U> backward;
+      unordered_map<U,V> forward;
+
+      V at(const U& s) {
+        auto found = forward.find(s);
+        if (found != forward.end()) return found->second;
+        V result = backward.size();
+        forward.insert(found, {s, result});
+        backward.push_back(s);
+        return result;
+      }
+    };
 
     template <class T, size_t N>
     array<T,N> filled_array(T value) {

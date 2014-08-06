@@ -5,11 +5,6 @@ namespace piecemeal {
   namespace logic {
     using namespace std;
 
-    namespace std {
-      template <class T> T begin(const pair<T,T>& p) { return p.first; }
-      template <class T> T end(const pair<T,T>& p) { return p.second; }
-    };
-
     template <class I, class T, size_t N>
     const unordered_set<array<T,N>>& ask(const I& index, 
       const array<T,N>& query, askstate<T,N>& state) {
