@@ -43,6 +43,8 @@ namespace kif {
     unordered_dimap<string> tokens;
     unordered_set<array<T,N>> grounds;
     vector<rule<T,N>> rules;
+
+    scope() { tokens.at(""); }
   };
 
   inline static bool is_var(dag::cnode<string> node) {
@@ -144,7 +146,7 @@ namespace kif {
 
 int main(int nargs, char** argv) {
 
-  string raw_string = "(<= (q ?x) (p ?x)) (<= (p ?y) (r ?y)) (r bloop)";
+  string raw_string = "(<= (q ?x) (p ?x))(r bloop) (<= (p ?y) (r ?y)) (r blip)";
   auto parsed = dag::loads(raw_string);
   cout << dag::dumps(parsed) << endl;
   auto scope = kif::parse<uint8_t, 8>(parsed);

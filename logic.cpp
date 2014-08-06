@@ -1,8 +1,6 @@
 
 #include "logic.h"
 
-#include <iostream>
-
 namespace piecemeal {
   namespace logic {
     using namespace std;
@@ -13,33 +11,37 @@ namespace piecemeal {
     };
 
     template <class I, class T, size_t N>
-    const unordered_set<array<T,N>>& _ask(const I& index, 
+    const unordered_set<array<T,N>>& ask(const I& index, 
       const array<T,N>& query, askstate<T,N>& state) {
       static const unordered_set<array<T,N>>& empty = {};
-      cout << "Query: ";
-      for (auto a : query) cout << (int)a << " ";
-      cout << endl;
       if (is_blank(query)) return empty;
 
+      // Check in the cache -- this check also serves the purpose of preventing
+      // infinite loops on improperly grounded recursive rules
       auto found = state.find(query);
       if (found != state.end()) return found->second;
       auto& result = state[query];
 
+      // If this is a grounded query, we can do a find instead of a filtration
+      // on the set of grounds in the known scope. In order to check for a
+      // negation, we ask the index to come up with a query that is "the next
+      // level up" in abstraction and check for the ground in that set.
       auto& known = index[query];
       auto& grounds = known.grounds;
       if (is_grounded(query)) {
         if (grounds.find(query) != grounds.end()) result.emplace(query);
-        auto& asked = _ask(index, index.parent(query), state);
+        auto& asked = ask(index, index.parent(query), state);
         if (asked.find(query) != asked.end()) result.emplace(query);
         return result;
       }
 
-      cout << "Checking " << known.grounds.size() << " grounds." << endl;
+      // Check for grounds that have been explicitly specified
       for (auto& ground : grounds) {
         if (check_conflict(query, ground)) result.emplace(ground);
       }
 
-      cout << "Checking " << known.rules.size() << " rules." << endl;
+      // Recursively sastisfy each of the positive terms. Once all terms are
+      // satisfied, we check the negative terms and the distinct constraints.
       for (auto& rule : known.rules) {
         auto& head = rule.head;
         auto space = transfer(logic::empty_array<T,N>(), head.pull, query);
@@ -52,7 +54,7 @@ namespace piecemeal {
 
             for (auto& negative : rule.negatives) {
               auto next = transfer(negative.literal, negative.push, current);
-              if (_ask(index, next, state).size() > 0) return;
+              if (ask(index, next, state).size() > 0) return;
             }
 
             auto ground = transfer(head.literal, head.push, current);
@@ -60,7 +62,7 @@ namespace piecemeal {
           } else {
             auto& positive = rule.positives[i];
             auto next = transfer(positive.literal, positive.push, current);
-            for (auto& entry : _ask(index, next, state)) {
+            for (auto& entry : ask(index, next, state)) {
               auto next = transfer(current, positive.pull, entry);
               if (is_blank(next)) continue;
               satisfy(next , i + 1);
@@ -71,12 +73,6 @@ namespace piecemeal {
       }
 
       return result;
-    }
-
-    template <class T, size_t N>
-    const unordered_set<array<T,N>>& ask(const prefix_index<T,N>& index,
-      const array<T,N>& query, askstate<T,N>& state) {
-      return _ask(index, query, state);
     }
 
     template const unordered_set<array<uint8_t,8>>& ask(
