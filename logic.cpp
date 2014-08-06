@@ -1,6 +1,8 @@
 
 #include "logic.h"
 
+#include <iostream>
+
 namespace piecemeal {
   namespace logic {
     using namespace std;
@@ -10,63 +12,76 @@ namespace piecemeal {
       template <class T> T end(const pair<T,T>& p) { return p.second; }
     };
 
-    template <class T, size_t N>
-    const unordered_set<array<T,N>>& ask(const vector<vector<rule<T,N>>>& ruleset,
+    template <class I, class T, size_t N>
+    const unordered_set<array<T,N>>& _ask(const I& index, 
       const array<T,N>& query, askstate<T,N>& state) {
       static const unordered_set<array<T,N>>& empty = {};
-      static const unordered_set<array<T,N>>& identity =
-        { logic::empty_array<T,N>() };
+      cout << "Query: ";
+      for (auto a : query) cout << (int)a << " ";
+      cout << endl;
       if (is_blank(query)) return empty;
-      
+
+      auto found = state.find(query);
+      if (found != state.end()) return found->second;
+      auto& result = state[query];
+
+      auto& known = index[query];
+      auto& grounds = known.grounds;
       if (is_grounded(query)) {
-        auto& known = state.known;
-        if (known.find(query) != known.end()) return identity;
-        if (state.completed.contains(query[0])) return empty;
+        if (grounds.find(query) != grounds.end()) result.emplace(query);
+        auto& asked = _ask(index, index.parent(query), state);
+        if (asked.find(query) != asked.end()) result.emplace(query);
+        return result;
       }
 
-      auto& index = state.index;
-      auto found = index.find(query);
-      if (found != index.end()) return found->second;
-      unordered_set<array<T,N>>& result = index[query];
-      if (query[0] >= ruleset.size()) return empty;
+      cout << "Checking " << known.grounds.size() << " grounds." << endl;
+      for (auto& ground : grounds) {
+        if (check_conflict(query, ground)) result.emplace(ground);
+      }
 
-      for (auto& rule : ruleset[query[0]]) {
+      cout << "Checking " << known.rules.size() << " rules." << endl;
+      for (auto& rule : known.rules) {
         auto& head = rule.head;
-        auto space = logic::empty_array<T,N>();
+        auto space = transfer(logic::empty_array<T,N>(), head.pull, query);
         function<void (decltype(space),size_t)> satisfy =
           [&](decltype(space) current, size_t i) {
-          if (is_blank(current)) return;
-
           if (i == rule.positives.size()) {
             for (auto& distinct : rule.distincts) {
               if (!check_distinct(distinct, current)) return;
             }
+
             for (auto& negative : rule.negatives) {
               auto next = transfer(negative.literal, negative.push, current);
-              if (ask(ruleset, next, state).size() > 0) return;
+              if (_ask(index, next, state).size() > 0) return;
             }
 
-            auto proposition = transfer(head.literal, head.push, current);
-            state.known.emplace(proposition);
-            result.emplace(proposition);
+            auto ground = transfer(head.literal, head.push, current);
+            result.emplace(ground);
           } else {
             auto& positive = rule.positives[i];
             auto next = transfer(positive.literal, positive.push, current);
-            for (auto& entry : ask(ruleset, next, state)) {
-              satisfy(transfer(current, positive.pull, entry), i + 1);
+            for (auto& entry : _ask(index, next, state)) {
+              auto next = transfer(current, positive.pull, entry);
+              if (is_blank(next)) continue;
+              satisfy(next , i + 1);
             }
           }
         };
         satisfy(space, 0);
       }
 
-      if (is_blank(query)) state.completed.set(query[0], true);
       return result;
     }
 
-    template const unordered_set<array<uint8_t,16>>& ask(
-      const vector<vector<rule<uint8_t,16>>>& ruleset,
-      const array<uint8_t,16>& query, askstate<uint8_t,16>& state);
+    template <class T, size_t N>
+    const unordered_set<array<T,N>>& ask(const prefix_index<T,N>& index,
+      const array<T,N>& query, askstate<T,N>& state) {
+      return _ask(index, query, state);
+    }
+
+    template const unordered_set<array<uint8_t,8>>& ask(
+      const prefix_index<uint8_t,8>& index, const array<uint8_t,8>& query,
+      askstate<uint8_t,8>& state);
   }
 }
 

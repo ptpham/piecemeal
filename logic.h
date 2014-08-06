@@ -24,9 +24,21 @@ namespace piecemeal {
 
     template <class T, size_t N>
     bool check_distinct(const array<T,N>& distinct, const array<T,N>& target) {
-      for (size_t i = 0; i < target.size(); i++) {
-        if (distinct[i] < target.size()
-          && target[distinct[i]] == target[i]) return false;
+      for (size_t i = 0; i < N; i++) {
+        if (distinct[i] == empty<T,N>()) continue;
+        auto left = target[i], right = target[distinct[i]];
+        if (left == empty<T,N>() || right == empty<T,N>()) continue;
+        if (left == right) return false;
+      }
+      return true;
+    }
+
+    template <class T, size_t N>
+    bool check_conflict(const array<T,N>& left, const array<T,N>& right) {
+      for (size_t i = 0; i < N; i++) {
+        auto first = left[i], second = right[i];
+        if (first == empty<T,N>() || second == empty<T,N>()) continue;
+        if (first != second) return false;
       }
       return true;
     }
@@ -58,7 +70,7 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    auto invert(const array<T,N>& trans) {
+    array<T,N> invert(const array<T,N>& trans) {
       auto size = *stdaux::max_element_nullable(
         trans.begin(), trans.end(), empty<T,N>());
       if (size == empty<T,N>()) return trans;
@@ -75,7 +87,7 @@ namespace piecemeal {
 
       term() { }
       term(const array<T,N>& a) : literal(a),
-        push(array<T,N>(a.id(),0)), pull(array<T,N>(a.id(),0)) { }
+        push(empty_array<T,N>()), pull(empty_array<T,N>()) { }
       term(const array<T,N>& a, const array<T,N>& push, const array<T,N>& pull) :
         literal(a), push(push), pull(pull) { }
     };
@@ -88,26 +100,46 @@ namespace piecemeal {
     };
 
     template <class T, size_t N>
-    struct askstate {
-      typedef unordered_map<array<T,N>, unordered_set<array<T,N>>> query_index;
-      unordered_set<array<T,N>> known;
-      stdaux::bitvector completed;
-      query_index index;
+    struct knowledge {
+      vector<rule<T,N>> rules;
+      unordered_set<array<T,N>> grounds;
     };
 
     template <class T, size_t N>
-    const unordered_set<array<T,N>>& ask(const vector<vector<rule<T,N>>>& ruleset,
-      const array<T,N>& query, askstate<T,N>& state);
+    struct prefix_index : vector<knowledge<T,N>> {
+      const knowledge<T,N> empty = {};
+
+      knowledge<T,N>& assure(size_t id) {
+        if (id >= this->size()) this->resize(id + 1);
+        return this->at(id);
+      }
+
+      array<T,N> parent(const array<T,N>& ground) const {
+        array<T,N>result = empty_array<T,N>();
+        result[0] = ground[0];
+        return result;
+      }
+
+      void emplace(const array<T,N>& ground) {
+        assure(ground[0]).grounds.emplace(ground);
+      }
+
+      void emplace(const rule<T,N>& rule) {
+        assure(rule.head.literal[0]).rules.push_back(rule);
+      }
+
+      const knowledge<T,N>& operator[] (const array<T,N>& query) const {
+        if (query[0] >= this->size()) return empty;
+        else return this->at(query[0]);
+      }
+    };
 
     template <class T, size_t N>
-    vector<vector<rule<T,N>>> index_by_position(
-      const vector<rule<T,N>>& rules, int pos = 0) {
-      auto size = stdaux::max_extraction(rules.begin(), rules.end(), 
-        [=] (auto& rule) { return rule.head.literal[pos]; }) + 1;
-      vector<vector<rule<T,N>>> result(size);
-      for (auto& rule : rules) result[rule.head.literal[pos]].push_back(rule);
-      return result; 
-    }
+    using askstate = unordered_map<array<T,N>, unordered_set<array<T,N>>>;
+
+    template <class T, size_t N>
+    const unordered_set<array<T,N>>& ask(const prefix_index<T,N>& index,
+      const array<T,N>& query, askstate<T,N>& state);
   }
 }
 

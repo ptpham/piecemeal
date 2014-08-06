@@ -10,13 +10,13 @@ using namespace piecemeal;
 using namespace piecemeal::logic;
 
 template <class T, size_t N>
-ostream& operator << (ostream& out, array<T,N>& a) {
+ostream& operator << (ostream& out, const array<T,N>& a) {
   for (int v : a) cout << " " << v;
   return out;
 }
 
 template <class T, size_t N>
-ostream& operator << (ostream& out, term<T,N>& t) {
+ostream& operator << (ostream& out, const term<T,N>& t) {
   return out << t.literal << " <- " << t.push << " -> " << t.pull;
 }
 
@@ -41,7 +41,7 @@ namespace kif {
   template <class T, size_t N>
   struct scope {
     unordered_dimap<string> tokens;
-    unordered_set<array<T,N>> known;
+    unordered_set<array<T,N>> grounds;
     vector<rule<T,N>> rules;
   };
 
@@ -52,10 +52,12 @@ namespace kif {
   template <class T, size_t N>
   auto extract_literal(unordered_dimap<string>& tokens,
     const vector<dag::cnode<string>>& leaves) {
-    auto result = logic::empty_array<T,N>();
+    auto result = stdaux::filled_array<T,N>(0);
     for (size_t i = 0; i < leaves.size(); i++) {
       if (!is_var(leaves[i])) result[i] = tokens.at(leaves[i]->value);
+      else result[i] = logic::empty<T,N>();
     };
+
     return result;
   }
 
@@ -66,8 +68,9 @@ namespace kif {
     for (size_t i = 0; i < leaves.size(); i++) {
       auto found = vars.find(leaves[i]->value);
       if (found == vars.end()) continue;
-      result[i] = found->second;
+      else result[i] = found->second;
     }
+    
     return result;
   }
 
@@ -109,7 +112,7 @@ namespace kif {
       if (child->size() == 1 || child->at(0)->value != "<=") {
         dag::cnode<string> const_child = child;
         auto leaves = dag::gather::leaves(const_child);
-        result.known.emplace(extract_literal<T,N>(result.tokens, leaves));
+        result.grounds.emplace(extract_literal<T,N>(result.tokens, leaves));
         continue;
       }
 
@@ -144,20 +147,25 @@ int main(int nargs, char** argv) {
   string raw_string = "(<= (q ?x) (p ?x)) (<= (p ?y) (r ?y)) (r bloop)";
   auto parsed = dag::loads(raw_string);
   cout << dag::dumps(parsed) << endl;
-  auto scope = kif::parse<uint8_t, 16>(parsed);
+  auto scope = kif::parse<uint8_t, 8>(parsed);
+  logic::prefix_index<uint8_t, 8> index;
 
-  for (auto rule : scope.rules) {
+  for (auto& rule : scope.rules) {
     cout << rule.head << endl;
     for (auto term : rule.positives) cout << "\t" << term << endl;
+    index.emplace(rule);
   }
 
-  askstate<uint8_t, 16> state;
-  state.known = scope.known;
-  
-  auto ruleset = logic::index_by_position(scope.rules);
-  cout << "Ruleset size: " << ruleset.size() << endl;
-  auto proved = ask(ruleset,scope.rules[0].head.literal, state);
-  cout << "Proved " << state.known.size() << " proposition(s)." << endl;
+  for (auto& ground : scope.grounds) {
+    index.emplace(ground);
+  }
+
+  askstate<uint8_t, 8> state;
+  auto proved = ask(index, scope.rules[0].head.literal, state);
+
+  size_t total = 0; 
+  for (auto& cache : state) total += cache.second.size();
+  cout << "Proved " << total << " proposition(s)." << endl;
   return 0;
 }
 

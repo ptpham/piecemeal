@@ -19,7 +19,8 @@ namespace piecemeal {
       if (first == last) return last;
       I largest = first;
       for (++first; first != last; ++first) {
-        if (*largest != null && *largest < *first) largest = first;
+        if (*first == null) continue;
+        if (*largest == null || *largest < *first) largest = first;
       }
       return largest;
     }
