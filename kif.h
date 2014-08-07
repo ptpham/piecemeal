@@ -33,15 +33,18 @@ namespace piecemeal {
       const vector<dag::cnode<string>>& leaves);
 
     template <class T, size_t N>
-    term<T,N> extract_term(unordered_dimap<string>& tokens,
+    term<T,N> parse_term(unordered_dimap<string>& tokens,
       unordered_dimap<string>& vars, dag::cnode<string> node);
 
     template <class T, size_t N>
-    array<T,N> extract_distinct(unordered_dimap<string>& vars,
+    array<T,N> parse_distinct(unordered_dimap<string>& vars,
       dag::cnode<string> node);
 
     template <class T, size_t N>
-    scope<T,N> parse(dag::cnode<string> root);
+    void parse_sentence(scope<T,N>& scope, dag::cnode<string>& sentence);
+
+    template <class T, size_t N>
+    scope<T,N> parse_sentences(dag::cnode<string> sentences);
   }
 }
 

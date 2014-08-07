@@ -21,12 +21,21 @@ ostream& operator << (ostream& out, const term<T,N>& t) {
   return out << t.literal << " <- " << t.push << " -> " << t.pull;
 }
 
+namespace piecemeal {
+  namespace gdl {
+    
+     
+
+  }
+}
+
 int main(int nargs, char** argv) {
 
   string raw_string = "(<= (q ?x) (p ?x))(r bloop) (<= (p ?y) (r ?y)) (r blip)";
   auto parsed = dag::loads(raw_string);
   cout << dag::dumps(parsed) << endl;
-  auto scope = kif::parse<uint8_t, 8>(parsed);
+  dag::cnode<string> sentences = parsed;
+  auto scope = kif::parse_sentences<uint8_t, 8>(parsed);
   logic::prefix_index<uint8_t, 8> index;
 
   for (auto& rule : scope.rules) {
