@@ -18,8 +18,15 @@ namespace piecemeal {
       return node<T>(ptr);
     }
 
-    node<string> loads(const string& raw, char begin = '(', char end = ')');
-    string dumps(node<string> ptr, char begin = '(', char end = ')');
+    template <class T>
+    node<T> convert(const vector<node<T>>& elems) {
+      auto result = wrap(T{});
+      for (auto elem : elems) result->push_back(elem);
+      return result;
+    }
+
+    node<string> loads_tree(const string& raw, char begin = '(', char end = ')');
+    string dumps_tree(node<string> ptr, char begin = '(', char end = ')');
   }
 }
 

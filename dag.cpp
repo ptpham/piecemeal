@@ -2,7 +2,7 @@
 
 namespace piecemeal {
   namespace dag {
-    node<string> loads(const string& raw, char begin, char end) {
+    node<string> loads_tree(const string& raw, char begin, char end) {
       vector<dag::node<string>> stack;
       stack.push_back(dag::wrap<string>(""));
       size_t mark = -1;
@@ -27,7 +27,7 @@ namespace piecemeal {
       return stack[0];
     }
 
-    string dumps(node<string> ptr, char begin, char end) {
+    string dumps_tree(node<string> ptr, char begin, char end) {
       string result;
       if (ptr->size() == 0) {
         result += ptr->value;
@@ -35,7 +35,7 @@ namespace piecemeal {
         result += '(';
         for (size_t i = 0; i < ptr->size(); i++) {
           if (i > 0) result += ' ';
-          result += dumps(ptr->at(i), begin, end);
+          result += dumps_tree(ptr->at(i), begin, end);
         }
         result += ')';
       }
