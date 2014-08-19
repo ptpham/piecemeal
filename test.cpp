@@ -65,11 +65,22 @@ ostream& apply(ostream& os, const C& collection,
   return os; 
 }
 
+/*
+    template <class T, size_t N>
+    ostream& operator <<(ostream& out, const array<T,N>& t) {
+      out << "[";
+      for (size_t i = 0; i < N; i++) {
+        if (i > 0) out << " ";
+        out << (int)t[i];
+      }
+      return out << "]";
+    }
+*/
+
 template <class T, size_t N>
 ostream& operator << (ostream& out, const term<T,N>& t) {
-  return out << t.literal << " <- " << t.push << " -> " << t.pull;
+  return out << t.literal << " <- " << t.push << " <- " << t.pull;
 }
-
 
 template <class T>
 vector<vector<T>> cartesian(const vector<vector<T>>& original) {
@@ -119,7 +130,7 @@ namespace piecemeal {
       return result; 
     }
 
-    dag::node<string> deor_sentences(dag::cnode<string> sentences) {
+    dag::node<string> deor_sentences(const dag::node<string> sentences) {
       auto result = dag::wrap<string>("");
       for (auto sentence : *sentences) {
         for (auto child : deor_sentence(sentence)) result->push_back(child);
@@ -127,20 +138,62 @@ namespace piecemeal {
       return result;
     }
 
-    dag::node<string> unify_relation_structure(dag::cnode<string> sentences) {
-      dag::node<string> result;
-
-      return result;
+    void union_structure(dag::node<string>& canon, dag::cnode<string> other) {
+      if (other == nullptr) return;
+      if (canon == nullptr) canon = dag::wrap(string{});
+      while (canon->size() < other->size()) {
+        auto target = other->at(canon->size());
+        canon->push_back(dag::wrap(string{}));
+      }
+      for (size_t i = 0; i < other->size(); i++) {
+        union_structure(canon->at(i), other->at(i));
+      }
     }
 
+    void canonize_term(dag::cnode<string> canon, dag::node<string>& other) {
+      if (canon == nullptr) return;
+      if (other == nullptr) other = dag::wrap<string>("");
+      while (other->size() < canon->size()) {
+        auto created = dag::wrap<string>(other->value);
+        other->push_back(created);
+      }
+      for (size_t i = 0; i < other->size(); i++) {
+        canonize_term(canon->at(i), other->at(i));
+      }
+    }
+
+    void canonize_sentences(const vector<dag::node<string>>& sentences) {
+      if (sentences.size() == 0) return;
+      map<string, dag::node<string>> index;
+      vector<dag::node<string>> terms;
+
+      // Gather all terms for iteration
+      for (size_t i = 0; i < sentences.size(); i++) {
+        for (auto child : *sentences[i]) {
+          if (child->size() < 2) continue;
+          terms.push_back(child);
+        }
+      }
+
+      // Construct canonical versions of each relation
+      for (auto term : terms) {
+        union_structure(index[term->at(0)->value], term);
+      }
+
+      // Canonize all relations in all sentences
+      for (auto term : terms) {
+        canonize_term(index[term->at(0)->value], term);
+      }
+    }
   }
 }
 
 int main(int nargs, char** argv) {
-  string raw_string = "(<= (q ?x) (p ?x))(r bloop) (<= (p ?y) (r ?y)) \
-    (<= (p awesome) (or (r blip) (r blim) (r bloop)))";
+  string raw_string = "(<= (z ?x) (q ?x)) (<= (q ?x) (p ?x))(r bloop) (<= (p ?y) (r ?y)) \
+    (<= (p awesome) (or (r blip) (r blim) (r bloop))) (<= (z (f ?x)) (t ?x))";
   auto parsed = dag::loads_tree(raw_string);
   parsed = gdl::deor_sentences(parsed);
+  gdl::canonize_sentences(*parsed);
   cout << dag::dumps_tree(parsed) << endl;
   auto scope = kif::parse_sentences<uint8_t, 8>(parsed);
   logic::prefix_index<uint8_t, 8> index;
@@ -152,6 +205,7 @@ int main(int nargs, char** argv) {
   }
 
   for (auto& ground : scope.grounds) {
+    cout << "Ground: " << ground << endl;
     index.emplace(ground);
   }
 
@@ -159,7 +213,11 @@ int main(int nargs, char** argv) {
   auto proved = ask(index, scope.rules[0].head.literal, state);
 
   size_t total = 0; 
-  for (auto& cache : state) total += cache.second.size();
+  cout << "Proved: " << endl;
+  for (auto& cache : state) {
+    total += cache.second.size();
+    for (auto elem : cache.second)  cout << elem << endl;
+  }
   cout << "Proved " << total << " proposition(s)." << endl;
   return 0;
 }

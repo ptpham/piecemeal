@@ -1,6 +1,9 @@
 
 #include "logic.h"
 
+#include <iostream>
+using namespace std;
+
 namespace piecemeal {
   namespace logic {
     using namespace std;
@@ -58,9 +61,11 @@ namespace piecemeal {
             auto& positive = rule.positives[i];
             auto next = transfer(positive.literal, positive.push, current);
             for (auto& entry : ask(index, next, state)) {
-              auto next = transfer(current, positive.pull, entry);
-              if (is_blank(next)) continue;
-              satisfy(next , i + 1);
+              bool empty_pull = is_blank(positive.pull);
+              auto next = empty_pull ? current
+                : transfer(current, positive.pull, entry);
+              if (!empty_pull && is_blank(next)) continue;
+              satisfy(next, i + 1);
             }
           }
         };
