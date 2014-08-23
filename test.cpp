@@ -3,9 +3,11 @@
 #include <map>
 #include <set>
 
-#include "logic.h"
 #include "kif.h"
 #include "dag.h"
+
+#include "logic.h"
+#include "logic/prefix_index.h"
 
 using namespace std;
 using namespace piecemeal;
