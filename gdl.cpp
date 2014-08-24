@@ -53,7 +53,8 @@ namespace piecemeal {
       if (other == nullptr) other = dag::wrap<string>("");
       while (other->size() < canon->size()) {
         auto created = dag::wrap<string>(other->value);
-        other->push_back(created);
+        if (other->size() + 1 == canon->size()) other->push_back(created);
+        else other->push_back(dag::wrap<string>(""));
       }
       for (size_t i = 0; i < other->size(); i++) {
         canonize_term(canon->at(i), other->at(i));
