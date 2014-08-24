@@ -21,13 +21,13 @@ namespace piecemeal {
         return this->at(id);
       }
 
-      array<T,N> parent(const array<T,N>& ground) const {
-        array<T,N>result = empty_array<T,N>();
+      unit<T,N> parent(const unit<T,N>& ground) const {
+        unit<T,N>result = empty_unit<T,N>();
         result[0] = ground[0];
         return result;
       }
 
-      void emplace(const array<T,N>& ground) {
+      void emplace(const unit<T,N>& ground) {
         assure(ground[0]).grounds.emplace(ground);
       }
 
@@ -35,7 +35,7 @@ namespace piecemeal {
         assure(rule.head.literal[0]).rules.push_back(rule);
       }
 
-      const knowledge<T,N>& operator[] (const array<T,N>& query) const {
+      const knowledge<T,N>& operator[] (const unit<T,N>& query) const {
         if (query[0] >= this->size()) return empty;
         else return this->at(query[0]);
       }

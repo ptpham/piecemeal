@@ -3,9 +3,9 @@
 namespace piecemeal {
   namespace kif {
     template <class T, size_t N>
-    array<T,N> extract_literal(unordered_dimap<string>& tokens,
+    unit<T,N> extract_literal(unordered_dimap<string>& tokens,
       const vector<dag::cnode<string>>& leaves) {
-      auto result = stdaux::filled_array<T,N>(0);
+      unit<T,N> result(0);
       for (size_t i = 0; i < leaves.size(); i++) {
         if (!is_var(leaves[i])) result[i] = tokens.at(leaves[i]->value);
         else result[i] = logic::empty<T,N>();
@@ -14,9 +14,9 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    array<T,N> extract_push(const unordered_map<string,size_t>& vars,
+    unit<T,N> extract_push(const unordered_map<string,size_t>& vars,
       const vector<dag::cnode<string>>& leaves) {
-      auto result = logic::empty_array<T,N>();
+      auto result = logic::empty_unit<T,N>();
       for (size_t i = 0; i < leaves.size(); i++) {
         auto found = vars.find(leaves[i]->value);
         if (found == vars.end()) continue;
@@ -36,9 +36,9 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    array<T,N> parse_distinct(unordered_dimap<string>& vars,
+    unit<T,N> parse_distinct(unordered_dimap<string>& vars,
       dag::cnode<string> node) {
-      array<T,N> result;
+      unit<T,N> result;
       fill(result.begin(), result.end(), logic::empty<T,N>());
 
       auto first = node->at(1);

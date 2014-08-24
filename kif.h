@@ -14,7 +14,7 @@ namespace piecemeal {
     template <class T, size_t N>
     struct scope {
       unordered_dimap<string> tokens;
-      unordered_set<array<T,N>> grounds;
+      unordered_set<unit<T,N>> grounds;
       vector<rule<T,N>> rules;
 
       scope() { tokens.at(""); }
@@ -25,11 +25,11 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    array<T,N> extract_literal(unordered_dimap<string>& tokens,
+    unit<T,N> extract_literal(unordered_dimap<string>& tokens,
       const vector<dag::cnode<string>>& leaves);
 
     template <class T, size_t N>
-    array<T,N> extract_push(const unordered_map<string,size_t>& vars,
+    unit<T,N> extract_push(const unordered_map<string,size_t>& vars,
       const vector<dag::cnode<string>>& leaves);
 
     template <class T, size_t N>
@@ -37,7 +37,7 @@ namespace piecemeal {
       unordered_dimap<string>& vars, dag::cnode<string> node);
 
     template <class T, size_t N>
-    array<T,N> parse_distinct(unordered_dimap<string>& vars,
+    unit<T,N> parse_distinct(unordered_dimap<string>& vars,
       dag::cnode<string> node);
 
     template <class T, size_t N>
