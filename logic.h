@@ -96,7 +96,7 @@ namespace std {
 
   template <class T, size_t N>
   ostream& operator << (ostream& out, const piecemeal::logic::term<T,N>& t) {
-    return out << t.literal << " <- " << t.push << " <- " << t.pull;
+    return out << t.literal << " <- " << t.push << " -> " << t.pull;
   }
 }
 
