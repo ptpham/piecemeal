@@ -1,36 +1,11 @@
 
 #include <map>
+#include <iostream>
 
 #include "gdl.h"
+#include "cartesian.h"
 
 using namespace std;
-
-template <class T>
-static vector<vector<T>> cartesian(const vector<vector<T>>& original) {
-  size_t dim = original.size();
-  vector<vector<T>> result;
-  if (dim == 0) return result;
-  for (auto& v : original) if (v.size() == 0) return result;
-
-  size_t pos[dim];
-  fill(pos, pos + dim, 0);
-  vector<T> cur(dim);
-
-  while (pos[0] < original[0].size()) {
-    // Store current position into result
-    for (size_t i = 0; i < dim; i++) cur[i] = original[i][pos[i]];
-    result.push_back(cur);
-
-    // Find the next valid position
-    for (size_t i = 1; i <= dim; i++) {
-      size_t j = dim - i;
-      if (++pos[j] < original[j].size()) break;
-      if (j > 0) pos[j] = 0;
-    }
-  }
-
-  return result;
-}
 
 namespace piecemeal {
   namespace gdl {
@@ -47,8 +22,9 @@ namespace piecemeal {
       }
 
       vector<dag::node<string>> result;
-      auto rendered = cartesian(space);
-      for (auto& elem : rendered) result.push_back(dag::convert(elem));
+      for (auto& elem : make_cartesian(space)) {
+        result.push_back(dag::convert(elem));
+      }
       return result; 
     }
 

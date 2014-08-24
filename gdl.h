@@ -15,3 +15,5 @@ namespace piecemeal {
     void canonize_sentences(const vector<dag::node<string>>& sentences);
   }
 }
+
+
