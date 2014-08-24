@@ -5,7 +5,7 @@
 #include "dag.h"
 
 namespace piecemeal {
-  namespace kif {
+  namespace compile {
 
     using namespace std;
     using namespace logic;

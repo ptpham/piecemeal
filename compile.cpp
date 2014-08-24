@@ -1,7 +1,7 @@
-#include "kif.h"
+#include "compile.h"
 
 namespace piecemeal {
-  namespace kif {
+  namespace compile {
     template <class T, size_t N>
     unit<T,N> extract_literal(unordered_dimap<string>& tokens,
       const vector<dag::cnode<string>>& leaves) {

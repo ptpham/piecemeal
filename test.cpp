@@ -1,10 +1,10 @@
 
-#include "kif.h"
 #include "dag.h"
 #include "gdl.h"
-
 #include "logic.h"
 #include "prefix_index.h"
+#include "compile.h"
+
 #include "stdfmt.h"
 
 using namespace std;
@@ -18,7 +18,7 @@ int main(int nargs, char** argv) {
   parsed = gdl::deor_sentences(parsed);
   gdl::canonize_sentences(*parsed);
   cout << dag::dumps_tree(parsed) << endl;
-  auto scope = kif::parse_sentences<uint8_t, 8>(parsed);
+  auto scope = compile::parse_sentences<uint8_t, 8>(parsed);
   logic::prefix_index<uint8_t, 8> index;
 
   for (auto& rule : scope.rules) {
