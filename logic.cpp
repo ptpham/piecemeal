@@ -1,6 +1,6 @@
 
 #include "logic.h"
-#include "logic/prefix_index.h"
+#include "prefix_index.h"
 
 #include <iostream>
 using namespace std;

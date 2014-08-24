@@ -8,7 +8,7 @@
 #include "gdl.h"
 
 #include "logic.h"
-#include "logic/prefix_index.h"
+#include "prefix_index.h"
 
 using namespace std;
 using namespace piecemeal;
