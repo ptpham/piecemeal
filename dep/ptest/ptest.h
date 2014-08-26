@@ -12,7 +12,8 @@ namespace ptest {
 
 #define TEST(name) \
 static void func_##name(); \
-static size_t registration_##name = ptest::add(string(__FILE__)+ ":" + #name, func_##name); \
+static size_t registration_##name = ptest::add(string(__FILE__) \
+  + ":" + #name, func_##name); \
 static void func_##name()
 
 

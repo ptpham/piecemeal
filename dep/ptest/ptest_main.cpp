@@ -22,7 +22,8 @@ int main(int argc, char** argv) {
   size_t passed = 0;
 
   for (auto& entry : all_tests) {
-    if (filter.size() > 0 && entry.first.find(filter) == string::npos) continue;
+    if (filter.size() > 0 && 
+      entry.first.find(filter) == string::npos) continue;
     string status = "passed";
     try {
       entry.second();
