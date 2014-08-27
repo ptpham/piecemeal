@@ -1,6 +1,6 @@
 
 #include "logic.h"
-#include "prefix_index.h"
+#include "position_index.h"
 
 #include <iostream>
 using namespace std;
@@ -127,7 +127,7 @@ namespace piecemeal {
 
 #define EXPORT(T,N) \
     template const unordered_set<unit<T,N>>& ask( \
-      const prefix_index<T,N>& index, const unit<T,N>& query, \
+      const position_index<T,N>& index, const unit<T,N>& query, \
       askstate<T,N>& state); \
     template unit<T,N> invert(const unit<T,N>&);
 
