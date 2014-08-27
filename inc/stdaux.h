@@ -2,6 +2,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 
 namespace std {
   template <class T> T begin(const pair<T,T>& p) { return p.first; }

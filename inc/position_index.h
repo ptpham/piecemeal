@@ -9,6 +9,8 @@
 #include <unordered_set>
 #include <unordered_map>
 
+#include "prop.h"
+
 namespace piecemeal {
   namespace logic {
     using namespace std;
@@ -25,13 +27,13 @@ namespace piecemeal {
         return this->at(id);
       }
 
-      unit<T,N> parent(const unit<T,N>& ground) const {
-        unit<T,N>result = empty_unit<T,N>();
+      prop<T,N> parent(const prop<T,N>& ground) const {
+        prop<T,N>result = empty_prop<T,N>();
         result[pos] = ground[pos];
         return result;
       }
 
-      void emplace(const unit<T,N>& ground) {
+      void emplace(const prop<T,N>& ground) {
         assure(ground[pos]).grounds.emplace(ground);
       }
 
@@ -39,7 +41,7 @@ namespace piecemeal {
         assure(rule.head.literal[pos]).rules.push_back(rule);
       }
 
-      const knowledge<T,N>& operator[] (const unit<T,N>& query) const {
+      const knowledge<T,N>& operator[] (const prop<T,N>& query) const {
         if (query[pos] >= this->size()) return empty;
         else return this->at(query[pos]);
       }
