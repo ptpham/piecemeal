@@ -78,12 +78,12 @@ namespace piecemeal {
         }
 
         // Handle positive and negative terms
-        auto& dst = rule.positives;
+        auto* dst = &rule.positives;
         if (term->size() > 1 && term->at(0)->value == "not") {
-          dst = rule.negatives;
+          dst = &rule.negatives;
           term = term->at(1);
         }
-        dst.push_back(parse_term<T,N>(scope.tokens, vars, term));
+        dst->push_back(parse_term<T,N>(scope.tokens, vars, term));
       }
 
       scope.rules.push_back(rule);

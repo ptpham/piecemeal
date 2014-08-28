@@ -37,12 +37,15 @@ TEST(ask_prop_positive_forward_order) {
 }
 
 TEST(ask_prop_negative) {
-  auto result = run("(<= c b) (<= b (not a))");
-  ASSERT(result.size() == 2);
+  ASSERT(run("(<= c b) (<= b (not a))").size() == 2);
 }
 
-TEST(ask_prop_distinct) {
-  ASSERT(false);
+TEST(ask_prop_distinct_success) {
+  ASSERT(run("(<= a (distinct b c))").size() == 1);
+}
+
+TEST(ask_prop_distinct_failure) {
+  ASSERT(run("(<= a (distinct b b))").size() == 0);
 }
 
 TEST(ask_var_positive) {
@@ -61,18 +64,24 @@ TEST(ask_var_negative_grounded) {
   ASSERT(run("(p a) (<= (q ?x) (p ?x) (not (r ?x)))").size() == 2);
 }
 
-TEST(ask_var_distinct_failure) {
-  ASSERT(run("(p a) (<= (q ?x) (p ?x) (p ?y) \
-    (distinct ?x ?y))").size() == 1);
-}
-
 TEST(ask_var_distinct_success) {
   ASSERT(run("(p a) (p b) (<= (q ?x) (p ?x) (p ?y) \
     (distinct ?x ?y))").size() == 4);
 }
 
-TEST(ask_var_prop_distinct) {
-  ASSERT(false);
+TEST(ask_var_distinct_failure) {
+  ASSERT(run("(p a) (<= (q ?x) (p ?x) (p ?y) \
+    (distinct ?x ?y))").size() == 1);
+}
+
+TEST(ask_var_prop_distinct_success) {
+  ASSERT(run("(p a) (<= (q ?x) (p ?x) (p ?y) \
+    (distinct ?x b))").size() == 1);
+}
+
+TEST(ask_var_prop_distinct_failure) {
+  ASSERT(run("(p a) (<= (q ?x) (p ?x) (p ?y) \
+    (distinct ?x a))").size() == 0);
 }
 
 TEST(ask_var_chain_positive) {
