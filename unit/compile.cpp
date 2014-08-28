@@ -8,19 +8,19 @@
 using namespace std;
 using namespace piecemeal;
 
-TEST(compile_term_no_vars) {
+TEST(parse_term_no_vars) {
   ASSERT(false);
 }
 
-TEST(compile_rule_positives) {
+TEST(parse_rule_positives) {
   ASSERT(false);
 }
 
-TEST(compile_rule_negatives) {
+TEST(parse_rule_negatives) {
   ASSERT(false);
 }
 
-TEST(compile_rule_distincts) {
+TEST(parse_rule_distincts) {
   ASSERT(false);
 }
 

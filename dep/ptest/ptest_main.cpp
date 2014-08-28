@@ -40,16 +40,22 @@ int main(int argc, char** argv) {
   map<string,string> errors;
   size_t passed = 0;
 
-  vector<string> all_names;
+  decltype(all_tests) filtered;
   for (auto& entry : all_tests) {
+    auto full_name = get_fullname(entry.first);
+    if (filter.size() > 0 && full_name.find(filter) == string::npos) continue;
+    filtered.insert(entry);
+  }
+
+  vector<string> all_names;
+  for (auto& entry : filtered) {
     auto full_name = get_fullname(entry.first);
     all_names.push_back(full_name);
   }
   auto prefix = common_prefix(all_names);
 
-  for (auto& entry : all_tests) {
+  for (auto& entry : filtered) {
     auto full_name = get_fullname(entry.first);
-    if (filter.size() > 0 && full_name.find(filter) == string::npos) continue;
     string status = "passed";
 
     try {

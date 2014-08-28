@@ -108,6 +108,7 @@ namespace piecemeal {
             }
 
             auto ground = transfer(head.literal, head.push, current);
+            if (!ground.is_grounded()) return;
             result.emplace(ground);
           } else {
             auto& positive = rule.positives[i];
