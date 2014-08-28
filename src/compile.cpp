@@ -8,7 +8,7 @@ namespace piecemeal {
       prop<T,N> result(0);
       for (size_t i = 0; i < leaves.size(); i++) {
         if (!is_var(leaves[i])) result[i] = tokens.at(leaves[i]->value);
-        else result[i] = logic::empty<T,N>();
+        else result[i] = prop<T,N>::empty();
       };
       return result;
     }
@@ -16,7 +16,7 @@ namespace piecemeal {
     template <class T, size_t N>
     prop<T,N> extract_push(const unordered_map<string,size_t>& vars,
       const vector<dag::cnode<string>>& leaves) {
-      auto result = logic::empty_prop<T,N>();
+      prop<T,N> result;
       for (size_t i = 0; i < leaves.size(); i++) {
         auto found = vars.find(leaves[i]->value);
         if (found == vars.end()) continue;
@@ -39,7 +39,7 @@ namespace piecemeal {
     prop<T,N> parse_distinct(unordered_dimap<string>& vars,
       dag::cnode<string> node) {
       prop<T,N> result;
-      fill(result.begin(), result.end(), logic::empty<T,N>());
+      fill(result.begin(), result.end(), prop<T,N>::empty());
 
       auto first = node->at(1);
       auto second = node->at(2);

@@ -21,8 +21,7 @@ namespace piecemeal {
       prop<T,N> literal, push, pull;
 
       term() { }
-      term(const prop<T,N>& a) : literal(a),
-        push(empty_prop<T,N>()), pull(empty_prop<T,N>()) { }
+      term(const prop<T,N>& a) : literal(a) { }
       term(const prop<T,N>& a, const prop<T,N>& push, const prop<T,N>& pull) :
         literal(a), push(push), pull(pull) { }
     };

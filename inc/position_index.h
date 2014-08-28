@@ -28,7 +28,7 @@ namespace piecemeal {
       }
 
       prop<T,N> parent(const prop<T,N>& ground) const {
-        prop<T,N>result = empty_prop<T,N>();
+        prop<T,N> result;
         result[pos] = ground[pos];
         return result;
       }

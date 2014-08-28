@@ -4,6 +4,8 @@
 #include <numeric>
 #include <array>
 
+#include "hashes.h"
+
 namespace piecemeal {
   namespace logic {
     using namespace std;
@@ -11,27 +13,22 @@ namespace piecemeal {
     template <class T, size_t N>
     struct prop : array<T,N> {
       prop(T value) { fill(this->begin(), this->end(), value); }
-      prop() { }
+      prop() : prop(empty()) { }
+
+      bool is_blank() const {
+        for (auto v : *this) if (v != empty()) return false;
+        return true;
+      }
+
+      bool is_grounded() const {
+        for (auto v : *this) if (v == empty()) return false;
+        return true;
+      }
+
+      static T empty() { return numeric_limits<T>::max(); }
     };
 
-    template <class T, size_t N>
-    T empty() { return numeric_limits<T>::max(); }
-
     template <class T, size_t N> prop<T,N> invert(const prop<T,N>& trans);
-
-    template <class T, size_t N>
-    prop<T,N> empty_prop() { return prop<T,N>(empty<T,N>()); }
-
-    template <class T, size_t N>
-    bool is_grounded(const prop<T,N>& a) {
-      for (auto v : a) { if (v == empty<T,N>()) return false; } return true;
-    }
-
-    template <class T, size_t N>
-    bool is_blank(const prop<T,N>& a) {
-      for (auto v : a) { if (v != empty<T,N>()) return false; } return true;
-    }
-
   }
 }
 

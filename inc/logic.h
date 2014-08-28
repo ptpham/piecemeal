@@ -39,7 +39,7 @@ namespace std {
     out << "[";
     for (size_t i = 0; i < N; i++) {
       if (i > 0) out << " ";
-      if (t[i] == piecemeal::logic::empty<T,N>()) out << "_";
+      if (t[i] == piecemeal::logic::prop<T,N>::empty()) out << "_";
       else out << (int64_t)t[i];
     }
     return out << "]";

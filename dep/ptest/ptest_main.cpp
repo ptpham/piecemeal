@@ -1,19 +1,38 @@
 
 #include <iostream>
 #include <functional>
+#include <numeric>
+#include <vector>
 #include <string>
 #include <map>
 
+#include "ptest.h"
+
 using namespace std;
 
-static map<string, function<void()>> all_tests;
+static map<pair<string,string>, function<void()>> all_tests;
 
 namespace ptest {
-  size_t add(const string& name, function<void()> fn) {
+  size_t add(const string& file, const string& name, function<void()> fn) {
     size_t result = all_tests.size();
-    all_tests[name] = fn;
+    all_tests[make_pair(file, name)] = fn;
     return result;
   }
+}
+
+static string common_prefix(const vector<string>& strings) {
+  if (strings.size() == 0) return 0;
+  auto prefix = strings[0];
+  for (auto& str : strings) {
+    for (size_t i = 0; i < prefix.size() && i < str.size(); i++) {
+      if (prefix[i] != str[i]) prefix = prefix.substr(0, i);
+    }
+  }
+  return prefix;
+}
+
+static string get_fullname(const pair<string,string>& p) {
+  return p.first + ":" + p.second;
 }
 
 int main(int argc, char** argv) {
@@ -21,25 +40,35 @@ int main(int argc, char** argv) {
   map<string,string> errors;
   size_t passed = 0;
 
+  vector<string> all_names;
   for (auto& entry : all_tests) {
-    if (filter.size() > 0 && 
-      entry.first.find(filter) == string::npos) continue;
+    auto full_name = get_fullname(entry.first);
+    all_names.push_back(full_name);
+  }
+  auto prefix = common_prefix(all_names);
+
+  for (auto& entry : all_tests) {
+    auto full_name = get_fullname(entry.first);
+    if (filter.size() > 0 && full_name.find(filter) == string::npos) continue;
     string status = "passed";
+
     try {
       entry.second();
       passed++;
-    } catch (std::runtime_error e) {
-      errors[entry.first] = e.what();
+    } catch (ptest::error e) {
+      errors[full_name] = e.file + ":" + entry.first.second + ":" +
+        to_string(e.line) + " " + e.what();
       status = "FAILED";
     }
-    cout << status << "  " << entry.first << endl;
+    cout << status << "  " << full_name.substr(prefix.size()) << endl;
   }
 
   size_t total = passed + errors.size();
   cout << "summary [" << passed << "/" << total << "]" << endl;
   
+  if (errors.size() > 0) cout << endl;
   for (auto& entry : errors) {
-    cout << "  " << entry.second << endl;
+    cout << "  " << entry.second.substr(prefix.size()) << endl;
   }
   
   return 0;
