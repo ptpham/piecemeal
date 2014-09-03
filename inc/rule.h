@@ -30,7 +30,7 @@ namespace piecemeal {
     struct rule {
       term<T,N> head;
       vector<term<T,N>> positives, negatives;
-      vector<prop<T,N>> distincts;
+      vector<pair<T,T>> distincts, prevents;
     };
 
   }

@@ -10,18 +10,6 @@ namespace piecemeal {
     using namespace std;
 
     template <class T, size_t N>
-    bool check_distinct(const prop<T,N>& distinct, const prop<T,N>& target) {
-      auto empty = prop<T,N>::empty();
-      for (size_t i = 0; i < N; i++) {
-        if (distinct[i] == empty) continue;
-        auto left = target[i], right = target[distinct[i]];
-        if (left == empty || right == empty) continue;
-        if (left == right) return false;
-      }
-      return true;
-    }
-
-    template <class T, size_t N>
     bool check_conflict(const prop<T,N>& left, const prop<T,N>& right) {
       auto empty = prop<T,N>::empty();
       for (size_t i = 0; i < N; i++) {
@@ -99,7 +87,11 @@ namespace piecemeal {
           [&](decltype(space) current, size_t i) {
           if (i == rule.positives.size()) {
             for (auto& distinct : rule.distincts) {
-              if (!check_distinct(distinct, current)) return;
+              if (current[distinct.first] == current[distinct.second]) return;
+            }
+            
+            for (auto& prevent : rule.prevents) {
+              if (current[prevent.first] == prevent.second) return;
             }
 
             for (auto& negative : rule.negatives) {

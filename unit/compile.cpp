@@ -12,15 +12,23 @@ TEST(parse_term_no_vars) {
   ASSERT(false);
 }
 
-TEST(parse_rule_positives) {
+TEST(parse_rule_positive) {
   ASSERT(false);
 }
 
-TEST(parse_rule_negatives) {
+TEST(parse_rule_negative) {
   ASSERT(false);
 }
 
-TEST(parse_rule_distincts) {
+TEST(parse_rule_distinct) {
+  ASSERT(false);
+}
+
+TEST(parse_rule_prevent) {
+  ASSERT(false);
+}
+
+TEST(parse_rule_prevent_flipped) {
   ASSERT(false);
 }
 

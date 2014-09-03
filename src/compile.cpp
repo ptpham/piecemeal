@@ -35,16 +35,32 @@ namespace piecemeal {
       return term<T,N>(head, push, logic::invert(push));
     }
 
-    template <class T, size_t N>
-    prop<T,N> parse_distinct(unordered_dimap<string>& vars,
-      dag::cnode<string> node) {
-      prop<T,N> result;
-      fill(result.begin(), result.end(), prop<T,N>::empty());
-
+    pair<bool,bool> distinct_var_mask(dag::cnode<string> node) {
       auto first = node->at(1);
       auto second = node->at(2);
-      result[vars.at(first->value)] = vars.at(second->value);
-      return result;
+      return make_pair(is_var(first), is_var(second));
+    }
+
+    template <class T, size_t N>
+    void parse_distinct(unordered_dimap<string>& tokens,
+      unordered_dimap<string>& vars, rule<T,N>& rule,
+      dag::cnode<string> term) {
+      
+      auto mask = distinct_var_mask(term);
+      if (!mask.first && !mask.second) return;
+      auto left = term->at(1), right = term->at(2);
+      auto* left_map = &vars, *right_map = &vars;
+
+      auto* target = &rule.distincts;
+      if (mask.first ^ mask.second) {
+        target = &rule.prevents;
+        if (!mask.first) swap(left, right);
+        right_map = &tokens;
+      }
+      
+      T first = left_map->at(left->value);
+      T second = right_map->at(right->value);
+      target->push_back({first,second});
     }
 
     template <class T, size_t N>
@@ -73,7 +89,7 @@ namespace piecemeal {
 
         // Handle distinct terms
         if (term->size() > 1 && term->at(0)->value == "distinct") {
-          rule.distincts.push_back(parse_distinct<T,N>(vars, term));
+          parse_distinct(scope.tokens, vars, rule, term);
           continue;
         }
 
