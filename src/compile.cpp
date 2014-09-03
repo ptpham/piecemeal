@@ -76,7 +76,7 @@ namespace piecemeal {
       if (child->size() == 1 || child->at(0)->value != "<=") {
         dag::cnode<string> const_child = child;
         auto leaves = dag::gather::leaves(const_child);
-        scope.grounds.emplace(extract_literal<T,N>(scope.tokens, leaves));
+        scope.props.emplace(extract_literal<T,N>(scope.tokens, leaves));
         return;
       }
 

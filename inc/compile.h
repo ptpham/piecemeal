@@ -17,7 +17,7 @@ namespace piecemeal {
     template <class T, size_t N>
     struct scope {
       unordered_dimap<string> tokens;
-      unordered_set<prop<T,N>> grounds;
+      unordered_set<prop<T,N>> props;
       vector<rule<T,N>> rules;
 
       scope() { tokens.at(""); }

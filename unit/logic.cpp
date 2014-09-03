@@ -19,7 +19,7 @@ static set<prop<uint8_t,8>> run(const string& raw) {
 
   logic::position_index<uint8_t, 8> index;
   for (auto& rule : scope.rules) { index.emplace(rule); }
-  for (auto& ground : scope.grounds) { index.emplace(ground); }
+  for (auto& prop : scope.props) { index.emplace(prop); }
 
   askstate<uint8_t, 8> state;
   set<prop<uint8_t,8>> result;
