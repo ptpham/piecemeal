@@ -14,15 +14,13 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    prop<T,N> extract_push(const unordered_map<string,size_t>& vars,
+    prop<T,N> extract_push(unordered_dimap<string>& vars,
       const vector<dag::cnode<string>>& leaves) {
       prop<T,N> result;
       for (size_t i = 0; i < leaves.size(); i++) {
-        auto found = vars.find(leaves[i]->value);
-        if (found == vars.end()) continue;
-        else result[i] = found->second;
+        if (!is_var(leaves[i])) continue;
+        result[i] = vars.at(leaves[i]->value);
       }
-      
       return result;
     }
 
@@ -31,7 +29,7 @@ namespace piecemeal {
       unordered_dimap<string>& vars, dag::cnode<string> node) {
       auto leaves = dag::gather::leaves(node);
       auto head = extract_literal<T,N>(tokens, leaves);
-      auto push = extract_push<T,N>(vars.forward, leaves);
+      auto push = extract_push<T,N>(vars, leaves);
       return term<T,N>(head, push, logic::invert(push));
     }
 
