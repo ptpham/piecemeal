@@ -16,7 +16,7 @@ static rule<uint8_t,8> run_rule(const string& raw) {
   return scope.rules[0];
 }
 
-TEST(parse_term_no_vars) {
+TEST(parse_term_no_var) {
   string raw = "(a (b c))";
   unordered_dimap<string> tokens, vars;
   dag::cnode<string> node = dag::loads_tree(raw);
@@ -31,7 +31,7 @@ TEST(parse_term_no_vars) {
   ASSERT(result.literal.is_grounded());
 }
 
-TEST(parse_term_vars) {
+TEST(parse_term_with_var) {
   string raw = "(f (?x ?y))";
   unordered_dimap<string> tokens, vars;
   dag::cnode<string> node = dag::loads_tree(raw);

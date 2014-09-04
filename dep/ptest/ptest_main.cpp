@@ -77,6 +77,6 @@ int main(int argc, char** argv) {
     cout << "  " << entry.second.substr(prefix.size()) << endl;
   }
   
-  return 0;
+  return errors.size() > 0 ? 1 : 0;
 }
 
