@@ -23,9 +23,14 @@ static set<prop<uint8_t,8>> run(const string& raw) {
 
   askstate<uint8_t, 8> state;
   set<prop<uint8_t,8>> result;
+  for (auto& prop : scope.props) ask(index, prop, state);
   for (auto& rule : scope.rules) ask(index, rule.head.literal, state);
   for (auto& cache : state) for (auto& p : cache.second) result.insert(p);
   return result;
+}
+
+TEST(ask_prop_positive_single) {
+  ASSERT(run("(p a b)").size() == 1);
 }
 
 TEST(ask_prop_positive_backward_order) {
@@ -79,5 +84,13 @@ TEST(ask_var_chain_positive) {
 
 TEST(ask_var_prop_chain) {
   ASSERT(run("(p a) (<= (q ?x) (p ?x)) (<= r (q ?x))").size() == 3);
+}
+
+TEST(ask_var_recursive_grounded) {
+  ASSERT(run("(p a b) (q a) (<= (q ?y) (q ?x) (p ?x ?y))").size() == 3);
+}
+
+TEST(ask_var_recursive_ungrounded) {
+  ASSERT(run("(p a b) (<= (q ?y) (q ?x) (p ?x ?y))").size() == 1);
 }
 
