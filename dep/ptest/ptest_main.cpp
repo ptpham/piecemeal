@@ -21,7 +21,7 @@ namespace ptest {
 }
 
 static string common_prefix(const vector<string>& strings) {
-  if (strings.size() == 0) return 0;
+  if (strings.size() == 0) return "";
   auto prefix = strings[0];
   for (auto& str : strings) {
     for (size_t i = 0; i < prefix.size() && i < str.size(); i++) {
