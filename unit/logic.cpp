@@ -16,10 +16,7 @@ using namespace piecemeal::logic;
 static set<prop<uint8_t,8>> run(const string& raw) {
   auto parsed = dag::loads_tree(raw);
   auto scope = compile::parse_sentences<uint8_t,8>(parsed);
-
-  logic::position_index<uint8_t, 8> index;
-  for (auto& rule : scope.rules) { index.emplace(rule); }
-  for (auto& prop : scope.props) { index.emplace(prop); }
+  logic::position_index<uint8_t, 8> index(scope);
 
   askstate<uint8_t, 8> state;
   set<prop<uint8_t,8>> result;

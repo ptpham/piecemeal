@@ -3,8 +3,7 @@
 
 #include <unordered_set>
 #include "unordered_dimap.h"
-#include "position_index.h"
-#include "compile.h"
+#include "prop.h"
 
 namespace piecemeal {
   namespace game {

@@ -21,6 +21,13 @@ namespace piecemeal {
 
       position_index() { }
       position_index(size_t pos) : pos(pos) { }
+
+      template <class S>
+      position_index(const S& scope, size_t pos = 0) {
+        this->emplace_rules(scope.rules);
+        this->emplace_props(scope.props);
+      }
+
       void clear() { for (auto& k : *this) k.clear(); }
 
       knowledge<T,N>& assure(size_t id) {
@@ -38,8 +45,18 @@ namespace piecemeal {
         assure(ground[pos]).grounds.emplace(ground);
       }
 
+      template <class C>
+      void emplace_props(const C& props) {
+        for (auto& prop : props) emplace(prop);
+      }
+
       void emplace(const rule<T,N>& rule) {
         assure(rule.head.literal[pos]).rules.push_back(rule);
+      }
+
+      template <class C>
+      void emplace_rules(const C& rules) {
+        for (auto& rule : rules) emplace(rule);
       }
 
       const knowledge<T,N>& operator[] (const prop<T,N>& query) const {
