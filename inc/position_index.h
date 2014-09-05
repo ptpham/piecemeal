@@ -9,7 +9,7 @@
 #include <unordered_set>
 #include <unordered_map>
 
-#include "prop.h"
+#include "logic.h"
 
 namespace piecemeal {
   namespace logic {
@@ -21,6 +21,7 @@ namespace piecemeal {
 
       position_index() { }
       position_index(size_t pos) : pos(pos) { }
+      void clear() { for (auto& k : *this) k.clear(); }
 
       knowledge<T,N>& assure(size_t id) {
         if (id >= this->size()) this->resize(id + 1);

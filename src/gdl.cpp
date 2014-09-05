@@ -9,6 +9,10 @@ using namespace std;
 
 namespace piecemeal {
   namespace gdl {
+    const string ROLE = "role", BASE = "base", INPUT = "input",
+      INIT = "init", GOAL = "goal", TERMINAL = "terminal",
+      TRUE = "true", NEXT = "next", LEGAL = "legal", DOES = "does";
+
     vector<dag::node<string>> deor_sentence(dag::node<string> original) {
       vector<vector<dag::node<string>>> space;
       for (auto child : *original) {
@@ -83,6 +87,13 @@ namespace piecemeal {
       for (auto term : terms) {
         canonize_term(index[term->at(0)->value], term);
       }
+    }
+
+    dag::node<string> preprocess_standard(const string& raw) {
+      auto loaded = dag::loads_tree(raw);
+      auto deorded = deor_sentences(loaded);
+      canonize_sentences(*deorded);
+      return deorded;
     }
   }
 }

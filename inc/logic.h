@@ -22,6 +22,7 @@ namespace piecemeal {
     struct knowledge {
       vector<rule<T,N>> rules;
       unordered_set<prop<T,N>> grounds;
+      void clear() { rules.clear(); grounds.clear(); }
     };
 
     template <class T, size_t N>

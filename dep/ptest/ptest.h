@@ -19,8 +19,8 @@ namespace ptest {
   __LINE__, #cond)
 
 #define TEST(name) \
-static void func_##name(); \
-static size_t registration_##name = ptest::add(__FILE__, #name, func_##name); \
-static void func_##name()
+static void ptest_##name(); \
+static size_t registration_##name = ptest::add(__FILE__, #name, ptest_##name); \
+static void ptest_##name()
 
 
