@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 
-#include "ptest.h"
+#include "ptest.hpp"
 
 using namespace std;
 

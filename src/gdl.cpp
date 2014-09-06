@@ -2,8 +2,8 @@
 #include <map>
 #include <iostream>
 
-#include "gdl.h"
-#include "cartesian.h"
+#include "gdl.hpp"
+#include "cartesian.hpp"
 
 using namespace std;
 

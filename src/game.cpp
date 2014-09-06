@@ -1,6 +1,6 @@
 
-#include "game.h"
-#include "gdl.h"
+#include "game.hpp"
+#include "gdl.hpp"
 
 namespace piecemeal {
   namespace game {

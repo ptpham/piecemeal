@@ -4,7 +4,7 @@
 #include <numeric>
 #include <array>
 
-#include "hashes.h"
+#include "hashes.hpp"
 
 namespace piecemeal {
   namespace logic {

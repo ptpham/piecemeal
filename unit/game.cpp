@@ -1,7 +1,7 @@
 
-#include "ptest.h"
-#include "game.h"
-#include "gdl.h"
+#include "ptest.hpp"
+#include "game.hpp"
+#include "gdl.hpp"
 
 using namespace piecemeal;
 using namespace stdaux;

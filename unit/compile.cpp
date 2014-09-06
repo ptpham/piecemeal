@@ -1,9 +1,9 @@
 
-#include "dag.h"
-#include "compile.h"
-#include "stdfmt.h"
+#include "dag.hpp"
+#include "compile.hpp"
+#include "stdfmt.hpp"
 
-#include "ptest.h"
+#include "ptest.hpp"
 
 using namespace std;
 using namespace piecemeal;

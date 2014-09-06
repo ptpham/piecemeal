@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "dag.h"
+#include "dag.hpp"
 
 namespace piecemeal {
   namespace gdl {

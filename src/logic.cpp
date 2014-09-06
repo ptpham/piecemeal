@@ -1,6 +1,6 @@
 
-#include "logic.h"
-#include "position_index.h"
+#include "logic.hpp"
+#include "position_index.hpp"
 
 #include <iostream>
 using namespace std;

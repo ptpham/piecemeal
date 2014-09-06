@@ -2,9 +2,9 @@
 #pragma once
 
 #include <unordered_set>
-#include "unordered_dimap.h"
-#include "compile.h"
-#include "prop.h"
+#include "unordered_dimap.hpp"
+#include "compile.hpp"
+#include "prop.hpp"
 
 namespace piecemeal {
   namespace game {

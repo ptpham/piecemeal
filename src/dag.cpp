@@ -1,4 +1,4 @@
-#include "dag.h"
+#include "dag.hpp"
 
 namespace piecemeal {
   namespace dag {

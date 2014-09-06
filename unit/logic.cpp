@@ -1,13 +1,13 @@
 
-#include "dag.h"
-#include "gdl.h"
-#include "logic.h"
-#include "position_index.h"
-#include "compile.h"
+#include "dag.hpp"
+#include "gdl.hpp"
+#include "logic.hpp"
+#include "position_index.hpp"
+#include "compile.hpp"
 
-#include "stdfmt.h"
+#include "stdfmt.hpp"
 
-#include "ptest.h"
+#include "ptest.hpp"
 
 using namespace std;
 using namespace piecemeal;

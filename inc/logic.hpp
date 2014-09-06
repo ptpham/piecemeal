@@ -10,9 +10,9 @@
 
 #include <iostream>
 
-#include "hashes.h"
-#include "stdaux.h"
-#include "rule.h"
+#include "hashes.hpp"
+#include "stdaux.hpp"
+#include "rule.hpp"
 
 namespace piecemeal {
   namespace logic {
