@@ -34,7 +34,16 @@ namespace piecemeal {
       };
     }
 
+    template <class T, size_t N>
+    context<T,N> build_context(const string& raw) {
+      auto processed = gdl::preprocess_standard(raw);
+      auto scope = compile::parse_sentences<T,N>(processed); 
+      auto fixture = build_fixture<T,N>(scope.tokens);
+      return { scope, fixture };
+    }
+
     template fixture<uint8_t,8> build_fixture(unordered_dimap<string>& tokens);
+    template context<uint8_t,8> build_context(const string& raw);
   }
 }
 

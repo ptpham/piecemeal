@@ -65,17 +65,17 @@ namespace piecemeal {
       // negation, we ask the index to come up with a query that is "the next
       // level up" in abstraction and check for the ground in that set.
       auto& known = index[query];
-      auto& grounds = known.grounds;
+      auto& props = known.props;
       if (query.is_grounded()) {
-        if (grounds.find(query) != grounds.end()) result.emplace(query);
+        if (props.find(query) != props.end()) result.emplace(query);
         auto& asked = ask(index, index.parent(query), state);
         if (asked.find(query) != asked.end()) result.emplace(query);
         return result;
       }
 
-      // Check for grounds that have been explicitly specified
-      for (auto& ground : grounds) {
-        if (check_conflict(query, ground)) result.emplace(ground);
+      // Check for props that have been explicitly specified
+      for (auto& prop : props) {
+        if (check_conflict(query, prop)) result.emplace(prop);
       }
 
       // Recursively sastisfy each of the positive terms. Once all terms are
@@ -99,9 +99,9 @@ namespace piecemeal {
               if (ask(index, next, state).size() > 0) return;
             }
 
-            auto ground = transfer(head.literal, head.push, current);
-            if (!ground.is_grounded()) return;
-            result.emplace(ground);
+            auto prop = transfer(head.literal, head.push, current);
+            if (!prop.is_grounded()) return;
+            result.emplace(prop);
           } else {
             auto& positive = rule.positives[i];
             auto next = transfer(positive.literal, positive.push, current);

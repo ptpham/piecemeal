@@ -21,13 +21,6 @@ namespace piecemeal {
 
       position_index() { }
       position_index(size_t pos) : pos(pos) { }
-
-      template <class S>
-      position_index(const S& scope, size_t pos = 0) {
-        this->emplace_rules(scope.rules);
-        this->emplace_props(scope.props);
-      }
-
       void clear() { for (auto& k : *this) k.clear(); }
 
       knowledge<T,N>& assure(size_t id) {
@@ -35,28 +28,21 @@ namespace piecemeal {
         return this->at(id);
       }
 
-      prop<T,N> parent(const prop<T,N>& ground) const {
+      prop<T,N> parent(const prop<T,N>& p) const {
         prop<T,N> result;
-        result[pos] = ground[pos];
+        result[pos] = p[pos];
         return result;
       }
 
-      void emplace(const prop<T,N>& ground) {
-        assure(ground[pos]).grounds.emplace(ground);
-      }
-
-      template <class C>
-      void emplace_props(const C& props) {
-        for (auto& prop : props) emplace(prop);
-      }
-
+      void emplace(const prop<T,N>& p) { assure(p[pos]).props.emplace(p); }
       void emplace(const rule<T,N>& rule) {
         assure(rule.head.literal[pos]).rules.push_back(rule);
       }
 
-      template <class C>
-      void emplace_rules(const C& rules) {
-        for (auto& rule : rules) emplace(rule);
+      template <class K>
+      void emplace_knowledge(const K& scope) {
+        for (auto& rule : scope.rules) emplace(rule);
+        for (auto& prop : scope.props) emplace(prop);
       }
 
       const knowledge<T,N>& operator[] (const prop<T,N>& query) const {
