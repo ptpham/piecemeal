@@ -1,33 +1,36 @@
 
 #pragma once
 
+#include <vector>
 #include <unordered_set>
+
 #include "unordered_dimap.hpp"
 #include "compile.hpp"
-#include "prop.hpp"
+#include "logic.hpp"
 
 namespace piecemeal {
   namespace game {
     using namespace logic;
     using namespace stdaux;
 
+    enum keyword : size_t {
+      ROLE, BASE, INPUT, INIT, GOAL, TERMINAL, TRUE, NEXT, LEGAL, DOES,
+      KEYWORD_COUNT
+    };
+    
+    extern const vector<string> keyword_names;
+
     template <class T, size_t N>
     struct fixture {
-      const T role_id, base_id, input_id,
-        init_id, goal_id, terminal_id, true_id,
-        next_id, legal_id, does_id;
-      const prop<T,N> role_query, base_query, input_query,
-        init_query, goal_query, terminal_query, true_query,
-        next_query, legal_query, does_query;
+      const vector<T> ids;
+      const vector<prop<T,N>> queries;
 
-      prop<T,N> convert(const prop<T,N>& p, T target_id) const {
+      template <keyword K>
+      prop<T,N> convert(const prop<T,N>& p) const {
         prop<T,N> result = p;
-        result[0] = target_id;
+        result[0] = ids[K];
         return result;
       }
-
-      prop<T,N> as_true(const prop<T,N>& p) const {return convert(p, true_id);}
-      prop<T,N> as_does(const prop<T,N>& p) const {return convert(p, does_id);}
     };
 
     template <class T, size_t N>
@@ -41,6 +44,44 @@ namespace piecemeal {
 
     template <class T, size_t N>
     context<T,N> build_context(const string& raw);
+
+    template <class T, size_t N>
+    struct simulator {
+      context<T,N> context;
+      askstate<T,N> state;
+
+      simulator() { }
+      simulator(const string& raw) : context(build_context<T,N>(raw)) { }
+
+      template <keyword K, class I>
+      const unordered_set<prop<T,N>>& ask(const I& index) {
+        return logic::ask(index, context.fixture.queries[K], state);
+      }
+
+      template <keyword K>
+      prop<T,N> convert(const prop<T,N>& p) const {
+        // Not sure if this is a C++ issue or a bug with clang-503.0.40, but
+        // simply calling context.fixture.convert<K>(p) complains about trying
+        // to invoke a static method without an object. The function is
+        // reimplemented here to avoid this error.
+        prop<T,N> result = p;
+        result[0] = context.fixture.ids[K];
+        return result;
+      }
+
+      template <keyword K, class C>
+      vector<prop<T,N>> convert(const C& props) const {
+        vector<prop<T,N>> result;
+        result.reserve(props.size());
+        for (auto& p : props) result.push_back(convert<K>(p));
+        return result;
+      }
+
+      template <keyword U, keyword V, class I>
+      vector<prop<T,N>> ask_convert(const I& index) {
+        return convert<U>(ask<V>(index));
+      }
+    };
   }
 }
 

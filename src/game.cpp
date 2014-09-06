@@ -6,32 +6,20 @@ namespace piecemeal {
   namespace game {
     using namespace gdl;
 
+    const vector<string> keyword_names = { "role", "base", "input",
+      "init", "goal", "terminal", "true", "next", "legal", "does" };
+
     template <class T, size_t N>
     fixture<T,N> build_fixture(unordered_dimap<string>& tokens) {
-      prop<T,N> role_query, base_query, input_query,
-        init_query, goal_query, terminal_query, true_query,
-        next_query, legal_query, does_query;
-      role_query[0] = (T)tokens.at(ROLE);
-      base_query[0] = (T)tokens.at(BASE);
-      init_query[0] = (T)tokens.at(INIT);
-      goal_query[0] = (T)tokens.at(GOAL);
-      true_query[0] = (T)tokens.at(TRUE);
-      next_query[0] = (T)tokens.at(NEXT);
-      does_query[0] = (T)tokens.at(DOES);
-      legal_query[0] = (T)tokens.at(LEGAL);
-      input_query[0] = (T)tokens.at(INPUT);
-      terminal_query[0] = (T)tokens.at(TERMINAL);
+      vector<prop<T,N>> queries(KEYWORD_COUNT);
+      vector<T> ids(KEYWORD_COUNT);
 
-      return {
-        (T)tokens.at(ROLE), (T)tokens.at(BASE), (T)tokens.at(INPUT),
-        (T)tokens.at(INIT), (T)tokens.at(GOAL), (T)tokens.at(TERMINAL),
-        (T)tokens.at(TRUE), (T)tokens.at(NEXT), (T)tokens.at(LEGAL),
-        (T)tokens.at(DOES),
+      for (size_t i = 0; i < KEYWORD_COUNT; i++) {
+        ids[i] = (T)tokens.at(keyword_names[i]);
+        queries[i][0] = ids[i];
+      }
 
-        role_query, base_query, input_query,
-        init_query, goal_query, terminal_query, true_query,
-        next_query, legal_query, does_query
-      };
+      return { ids, queries };
     }
 
     template <class T, size_t N>

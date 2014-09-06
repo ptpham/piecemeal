@@ -9,10 +9,6 @@ using namespace std;
 
 namespace piecemeal {
   namespace gdl {
-    const string ROLE = "role", BASE = "base", INPUT = "input",
-      INIT = "init", GOAL = "goal", TERMINAL = "terminal",
-      TRUE = "true", NEXT = "next", LEGAL = "legal", DOES = "does";
-
     vector<dag::node<string>> deor_sentence(dag::node<string> original) {
       vector<vector<dag::node<string>>> space;
       for (auto child : *original) {
