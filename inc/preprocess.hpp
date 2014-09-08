@@ -5,7 +5,7 @@
 #include "dag.hpp"
 
 namespace piecemeal {
-  namespace gdl {
+  namespace preprocess {
     using namespace std;
 
     vector<dag::node<string>> deor_sentence(dag::node<string> original);
@@ -14,7 +14,7 @@ namespace piecemeal {
     void canonize_term(dag::cnode<string> canon, dag::node<string>& other);
     void canonize_sentences(const vector<dag::node<string>>& sentences);
 
-    dag::node<string> preprocess_standard(const string& raw);
+    dag::node<string> standard(const string& raw);
   }
 }
 

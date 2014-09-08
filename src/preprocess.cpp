@@ -2,13 +2,13 @@
 #include <map>
 #include <iostream>
 
-#include "gdl.hpp"
+#include "preprocess.hpp"
 #include "cartesian.hpp"
 
 using namespace std;
 
 namespace piecemeal {
-  namespace gdl {
+  namespace preprocess {
     vector<dag::node<string>> deor_sentence(dag::node<string> original) {
       vector<vector<dag::node<string>>> space;
       for (auto child : *original) {
@@ -85,7 +85,7 @@ namespace piecemeal {
       }
     }
 
-    dag::node<string> preprocess_standard(const string& raw) {
+    dag::node<string> standard(const string& raw) {
       auto loaded = dag::loads_tree(raw);
       auto deorded = deor_sentences(loaded);
       canonize_sentences(*deorded);

@@ -1,11 +1,9 @@
 
 #include "game.hpp"
-#include "gdl.hpp"
+#include "preprocess.hpp"
 
 namespace piecemeal {
   namespace game {
-    using namespace gdl;
-
     const vector<string> keyword_names = { "role", "base", "input",
       "init", "goal", "terminal", "true", "next", "legal", "does" };
 
@@ -24,7 +22,7 @@ namespace piecemeal {
 
     template <class T, size_t N>
     context<T,N> build_context(const string& raw) {
-      auto processed = gdl::preprocess_standard(raw);
+      auto processed = preprocess::standard(raw);
       auto scope = compile::parse_sentences<T,N>(processed); 
       auto fixture = build_fixture<T,N>(scope.tokens);
       return { scope, fixture };

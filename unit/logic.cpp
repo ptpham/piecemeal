@@ -1,7 +1,7 @@
 
 #include "dag.hpp"
-#include "gdl.hpp"
 #include "logic.hpp"
+#include "preprocess.hpp"
 #include "position_index.hpp"
 #include "compile.hpp"
 

@@ -7,7 +7,6 @@
 #include "position_index.hpp"
 #include "stdfmt.hpp"
 
-#include "gdl.hpp"
 #include "game.hpp"
 
 using namespace std;
