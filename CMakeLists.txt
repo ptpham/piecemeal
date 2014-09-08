@@ -8,3 +8,6 @@ add_executable(test_unit dep/ptest/ptest_main
   unit/logic unit/compile unit/game)
 target_link_libraries(test_unit piecemeal)
 
+add_executable(play src/play.cpp)
+target_link_libraries(play piecemeal)
+

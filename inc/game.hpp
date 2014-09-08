@@ -81,6 +81,17 @@ namespace piecemeal {
       vector<prop<T,N>> ask_convert(const I& index) {
         return convert<U>(ask<V>(index));
       }
+
+      template <template <class,size_t> class I>
+      I<T,N> create_index() { return I<T,N>(); }
+
+      template <class I, class S = vector<prop<T,N>>>
+      void bind_state(I& index, const S& turn = S()) {
+        index.clear_props();
+        index.emplace_props(context.scope.props);
+        index.emplace_props(turn);
+        state.clear();
+      }
     };
   }
 }

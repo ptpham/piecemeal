@@ -1,0 +1,27 @@
+(role x) (role o)
+(index 1) (index 2) (index 3)
+(init (control x))
+
+(<= (legal ?p (mark ?i ?j)) (true (control ?p)) (index ?i) (index ?j) (not (true (cell ?i ?j ?p))))
+(<= (legal ?p noop) (role ?p) (not (true (control ?p))))
+(<= (has_move ?p) (legal ?p (mark ?i ?j)))
+
+(<= (next (cell ?i ?j ?p)) (does ?p (mark ?i ?j)))
+(<= (next (cell ?i ?j ?p)) (true (cell ?i ?j ?p)))
+(<= (next (control x)) (true (control o)))
+(<= (next (control o)) (true (control x)))
+
+(<= (row ?p) (index ?i) (true (cell ?i 1 ?p)) (true (cell ?i 2 ?p)) (true (cell ?i 3 ?p)))
+(<= (col ?p) (index ?i) (true (cell 1 ?i ?p)) (true (cell 2 ?i ?p)) (true (cell 3 ?i ?p)))
+(<= (diag ?p) (true (cell 1 1 ?p)) (true (cell 2 2 ?p)) (true (cell 3 3 ?p)))
+
+(<= (line ?p) (row ?p))
+(<= (line ?p) (col ?p))
+(<= (line ?p) (diag ?p))
+
+(<= terminal (line ?p))
+(<= terminal (true (control ?p)) (not (has_move ?p)))
+
+(<= (goal ?p 100) (line ?p))
+(<= (goal ?p 0) (role ?p) (not (line ?p)))
+
