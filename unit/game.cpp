@@ -6,7 +6,7 @@ using namespace piecemeal;
 using namespace stdaux;
 using namespace game;
 
-TEST(fixture) {
+TEST(fixture_constants_match) {
   unordered_dimap<string> tokens;
   auto fixture = game::build_fixture<uint8_t,8>(tokens);
 

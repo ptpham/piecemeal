@@ -8,7 +8,14 @@ namespace piecemeal {
       size_t mark = -1;
 
       for (size_t i = 0; i < raw.size(); i++) {
-        bool extract = false;
+        bool is_control = raw[i] == end || raw[i] == begin;
+        bool token_end = isspace(raw[i]) || is_control;
+        if (token_end && mark != -1) {
+          auto value = raw.substr(mark, i - mark);
+          stack.back()->push_back(dag::wrap(value));
+          mark = -1;
+        }
+        if (raw[i] == end) stack.pop_back();
         if (raw[i] == begin) {
           auto new_node = dag::wrap<string>("");
           stack.back()->push_back(new_node);
@@ -16,13 +23,6 @@ namespace piecemeal {
         } else if (raw[i] != end && !isspace(raw[i]) && mark == -1) {
           mark = i; 
         }
-
-        bool token_end = isspace(raw[i]) || raw[i] == end;
-        if (token_end && mark != -1) {
-          stack.back()->push_back(dag::wrap(raw.substr(mark, i - mark)));
-          mark = -1;
-        }
-        if (raw[i] == end) stack.pop_back();
       }
       return stack[0];
     }
