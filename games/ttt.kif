@@ -2,7 +2,8 @@
 (index 1) (index 2) (index 3)
 (init (control x))
 
-(<= (legal ?p (mark ?i ?j)) (true (control ?p)) (index ?i) (index ?j) (not (true (cell ?i ?j ?p))))
+(<= (blocked ?i ?j) (true (cell ?i ?j ?p)))
+(<= (legal ?p (mark ?i ?j)) (true (control ?p)) (index ?i) (index ?j) (not (blocked ?i ?j)))
 (<= (legal ?p noop) (role ?p) (not (true (control ?p))))
 (<= (has_move ?p) (legal ?p (mark ?i ?j)))
 
@@ -18,10 +19,12 @@
 (<= (line ?p) (row ?p))
 (<= (line ?p) (col ?p))
 (<= (line ?p) (diag ?p))
+(<= (has_line) (line ?p))
 
 (<= terminal (line ?p))
 (<= terminal (true (control ?p)) (not (has_move ?p)))
 
 (<= (goal ?p 100) (line ?p))
-(<= (goal ?p 0) (role ?p) (not (line ?p)))
+(<= (goal ?p 0) (role ?p) (not (line ?p)) (has_line))
+(<= (goal ?p 50) (role ?p) (not (has_line)))
 
