@@ -69,7 +69,11 @@ namespace piecemeal {
       // Gather all terms for iteration
       for (size_t i = 0; i < sentences.size(); i++) {
         for (auto child : *sentences[i]) {
-          if (child->size() < 2) continue;
+          if (child->size() < 1) continue;
+          if (child->at(0)->value == "not") {
+            if (child->size() > 1) child = child->at(1);
+            else continue;
+          }
           terms.push_back(child);
         }
       }
