@@ -11,3 +11,5 @@ target_link_libraries(test_unit piecemeal)
 add_executable(cps src/cps.cpp)
 target_link_libraries(cps piecemeal)
 
+add_executable(play src/play.cpp)
+target_link_libraries(play piecemeal)
