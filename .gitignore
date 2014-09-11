@@ -7,3 +7,4 @@ cmake_install.cmake
 *.so
 test_*
 play
+cps
