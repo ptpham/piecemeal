@@ -19,32 +19,20 @@ using namespace game;
 typedef uint16_t ltype;
 constexpr size_t pwidth = 8;
 
-template <class I, class T>
-map<I,vector<T>> index_by_position(const vector<T>& props, I index) {
-  map<I,vector<T>> result;
-  for (auto& p : props) { result[p[index]].push_back(p); }
-  return result;
-}
+template <class T, size_t N>
+vector<prop<T,N>> random_joint_move(const vector<prop<T,N>>& moves, const map<T,size_t>& role_map) {
+  size_t nroles = role_map.size();
+  vector<prop<T,N>> result(nroles);
+  size_t seen[nroles];
 
-template <class T>
-T uniformly_at_random(T moves) {
-  static vector<bool> moved(numeric_limits<ltype>::max());
-  static vector<int> positions(numeric_limits<ltype>::max());
-  static vector<int> seen(numeric_limits<ltype>::max());
-
-  fill(moved.begin(), moved.end(), false);
-  decltype(moves) result;
+  fill(seen, seen + nroles, 0);
   for (auto move : moves) {
-    auto player = move[1];
-    if (!moved[player]) {
-      positions[player] = result.size();
-      result.resize(result.size() + 1);
-      seen[player] = 1;
-    } else if (rand() % seen[player] > 1) continue;
-
-    moved[player] = true;
-    result[positions[player]] = move;
-    seen[player]++;
+    auto found = role_map.find(move[1]);
+    if (found == role_map.end()) continue;
+    auto index = found->second;
+    if (seen[index] > 0 && rand() % seen[index] > 1) continue;
+    result[index] = move;
+    seen[index]++;
   }
   return result;
 }
@@ -65,6 +53,9 @@ int main(int argc, char* argv[]) {
   index.emplace_rules(sim.context.scope.rules);
 
   sim.bind_state(index);
+  auto roles = sim.ask<ROLE>(index);
+  map<ltype,size_t> role_map;
+  for (auto& role : roles) role_map[role[1]] = role_map.size();
   auto initial = sim.ask_convert<TRUE, INIT>(index);
 
   auto begin = clock();
@@ -74,7 +65,7 @@ int main(int argc, char* argv[]) {
     sim.bind_state(index, state);
     do {
       auto moves = sim.ask_convert<DOES, LEGAL>(index);
-      auto chosen = uniformly_at_random(moves);
+      auto chosen = random_joint_move(moves, role_map);
       index.emplace_props(chosen);
       state = sim.ask_convert<TRUE, NEXT>(index);
       sim.bind_state(index, state);
