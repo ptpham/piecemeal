@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_FLAGS "-std=c++1y -g -O3")
+set(CMAKE_CXX_FLAGS "-std=c++11 -g -O3")
 
 include_directories(inc dep/ptest)
 add_library(piecemeal src/logic src/dag src/compile src/preprocess src/game)

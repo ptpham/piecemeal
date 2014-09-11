@@ -30,12 +30,6 @@ namespace piecemeal {
       return largest;
     }
 
-    template <class I, class F>
-    auto max_extraction(I begin, I end, F converter) {
-      return converter(*std::max_element(begin, end, [&](auto i, auto j) {
-        return converter(i) < converter(j);
-      }));
-    }
   }
 }
 

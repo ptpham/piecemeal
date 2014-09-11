@@ -72,7 +72,7 @@ namespace piecemeal {
   namespace dag {
     namespace gather {
       template <class T>
-      auto leaves(T node) {
+      vector<T> leaves(T node) {
         vector<T> result;
         traverse::breadth(node, [&](T child) {
           if (child->size() > 0) return;
