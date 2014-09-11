@@ -23,9 +23,9 @@ namespace piecemeal {
     template <class T, size_t N>
     context<T,N> build_context(const string& raw) {
       auto processed = preprocess::standard(raw);
-      auto scope = compile::parse_sentences<T,N>(processed); 
-      auto fixture = build_fixture<T,N>(scope.tokens);
-      return { scope, fixture };
+      auto parse = compile::parse_sentences<T,N>(processed); 
+      auto fixture = build_fixture<T,N>(parse.tokens);
+      return { parse, fixture };
     }
 
 #define EXPORT(T,N) \

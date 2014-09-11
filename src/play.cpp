@@ -57,18 +57,18 @@ int main(int argc, char* argv[]) {
 
   game::simulator<ltype,pwidth> sim(raw);
   auto index = sim.create_index<position_index>();
-  index.emplace_rules(sim.context.scope.rules);
+  index.emplace_rules(sim.context.parse.rules);
 
   sim.bind_state(index);
   auto roles = sim.ask<ROLE>(index);
   map<ltype,size_t> role_map;
   for (auto& role : roles) role_map[role[1]] = role_map.size();
-  ltype hrole_index = sim.context.scope.tokens.forward.find(hrole)->second;
+  ltype hrole_index = sim.context.parse.tokens.forward.find(hrole)->second;
   auto initial = sim.ask_convert<TRUE, INIT>(index);
 
   size_t turn = 0;
   auto state = initial;
-  auto& backward = sim.context.scope.tokens.backward;
+  auto& backward = sim.context.parse.tokens.backward;
   sim.bind_state(index, state);
   do {
     auto moves = sim.ask_convert<DOES, LEGAL>(index);

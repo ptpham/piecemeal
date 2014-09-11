@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
   game::simulator<ltype,pwidth> sim(raw);
   auto index = sim.create_index<position_index>();
-  index.emplace_rules(sim.context.scope.rules);
+  index.emplace_rules(sim.context.parse.rules);
 
   sim.bind_state(index);
   auto roles = sim.ask<ROLE>(index);

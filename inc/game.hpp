@@ -38,7 +38,7 @@ namespace piecemeal {
 
     template <class T, size_t N>
     struct context {
-      const compile::scope<T,N> scope;
+      const compile::parse<T,N> parse;
       const fixture<T,N> fixture;
     };
 
@@ -88,7 +88,7 @@ namespace piecemeal {
       template <class I, class S = vector<prop<T,N>>>
       void bind_state(I& index, const S& turn = S()) {
         index.clear_props();
-        index.emplace_props(context.scope.props);
+        index.emplace_props(context.parse.props);
         index.emplace_props(turn);
         state.clear();
       }

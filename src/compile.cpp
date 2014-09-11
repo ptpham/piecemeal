@@ -62,7 +62,7 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    void parse_sentence(scope<T,N>& scope, const dag::cnode<string>& child) {
+    void parse_sentence(parse<T,N>& parse, const dag::cnode<string>& child) {
       if (child->size() == 0) return;
       rule<T,N> rule;
 
@@ -76,18 +76,18 @@ namespace piecemeal {
       if (child->size() == 1 || child->at(0)->value != "<=") {
         dag::cnode<string> const_child = child;
         auto leaves = dag::gather::leaves(const_child);
-        scope.props.emplace(extract_literal<T,N>(scope.tokens, leaves));
+        parse.props.emplace(extract_literal<T,N>(parse.tokens, leaves));
         return;
       }
 
       // Extract head and various body terms for full rules
-      rule.head = parse_term<T,N>(scope.tokens, vars, child->at(1));
+      rule.head = parse_term<T,N>(parse.tokens, vars, child->at(1));
       for (size_t i = 2; i < child->size(); i++) {
         auto term = child->at(i);
 
         // Handle distinct terms
         if (term->size() > 1 && term->at(0)->value == "distinct") {
-          parse_distinct(scope.tokens, vars, rule, term);
+          parse_distinct(parse.tokens, vars, rule, term);
           continue;
         }
 
@@ -97,21 +97,21 @@ namespace piecemeal {
           dst = &rule.negatives;
           term = term->at(1);
         }
-        dst->push_back(parse_term<T,N>(scope.tokens, vars, term));
+        dst->push_back(parse_term<T,N>(parse.tokens, vars, term));
       }
 
-      scope.rules.push_back(rule);
+      parse.rules.push_back(rule);
     }
 
     template <class T, size_t N>
-    scope<T,N> parse_sentences(dag::cnode<string> root) {
-      scope<T,N> result;
+    parse<T,N> parse_sentences(dag::cnode<string> root) {
+      parse<T,N> result;
       for (auto& child : *root) parse_sentence(result, child);
       return result;
     }
 
 #define EXPORT(T,N) \
-    template scope<T,N> parse_sentences(dag::cnode<string>);
+    template parse<T,N> parse_sentences(dag::cnode<string>);
 
     EXPORT(uint8_t,8)
     EXPORT(uint16_t,8)

@@ -15,12 +15,12 @@ namespace piecemeal {
     using namespace stdaux;
         
     template <class T, size_t N>
-    struct scope {
+    struct parse {
       unordered_dimap<string> tokens;
       unordered_set<prop<T,N>> props;
       vector<rule<T,N>> rules;
 
-      scope() { tokens.at(""); }
+      parse() { tokens.at(""); }
     };
 
     inline static bool is_var(dag::cnode<string> node) {
@@ -44,10 +44,10 @@ namespace piecemeal {
       dag::cnode<string> node);
 
     template <class T, size_t N>
-    void parse_sentence(scope<T,N>& scope, dag::cnode<string>& sentence);
+    void parse_sentence(parse<T,N>& parse, dag::cnode<string>& sentence);
 
     template <class T, size_t N>
-    scope<T,N> parse_sentences(dag::cnode<string> sentences);
+    parse<T,N> parse_sentences(dag::cnode<string> sentences);
   }
 }
 
