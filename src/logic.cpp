@@ -127,6 +127,7 @@ namespace piecemeal {
     template prop<T,N> invert(const prop<T,N>&);
 
     EXPORT(uint8_t,8)
+    EXPORT(uint16_t,8)
 #undef EXPORT
   }
 }

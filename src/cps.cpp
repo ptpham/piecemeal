@@ -16,8 +16,15 @@ using namespace piecemeal;
 using namespace logic;
 using namespace game;
 
-typedef uint8_t ltype;
+typedef uint16_t ltype;
 constexpr size_t pwidth = 8;
+
+template <class I, class T>
+map<I,vector<T>> index_by_position(const vector<T>& props, I index) {
+  map<I,vector<T>> result;
+  for (auto& p : props) { result[p[index]].push_back(p); }
+  return result;
+}
 
 template <class T>
 T uniformly_at_random(T moves) {

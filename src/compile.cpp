@@ -110,10 +110,14 @@ namespace piecemeal {
       return result;
     }
 
-    template scope<uint8_t,8> parse_sentences(dag::cnode<string>);
+#define EXPORT(T,N) \
+    template scope<T,N> parse_sentences(dag::cnode<string>);
+
+    EXPORT(uint8_t,8)
+    EXPORT(uint16_t,8)
+#undef EXPORT
   }
 }
-
 
 
 
