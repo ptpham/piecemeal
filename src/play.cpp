@@ -39,8 +39,8 @@ int main(int argc, char* argv[]) {
 
   game::simulator<ltype,pwidth> sim(raw);
   auto index = sim.create_index<position_index>();
-  auto role_map = sim.ask_role_map(index);
   auto initial = sim.ask_convert<TRUE, INIT>(index);
+  auto role_map = sim.ask_role_map(index);
 
   auto& parse = sim.context.parse;
   auto role_found = parse.tokens.forward.find(hrole);

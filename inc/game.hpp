@@ -60,13 +60,7 @@ namespace piecemeal {
 
       template <keyword K>
       prop<T,N> convert(const prop<T,N>& p) const {
-        // Not sure if this is a C++ issue or a bug with clang-503.0.40, but
-        // simply calling context.fixture.convert<K>(p) complains about trying
-        // to invoke a static method without an object. The function is
-        // reimplemented here to avoid this error.
-        prop<T,N> result = p;
-        result[0] = context.fixture.ids[K];
-        return result;
+        return context.fixture.template convert<K>(p);
       }
 
       template <keyword K, class C>
