@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
   size_t hrole_index = machine.role_map[role_found->second];
 
   auto& backward = parse.tokens.backward;
-  while (!machine.is_terminal()) {
+  while (!machine.terminal()) {
     auto moves = machine.moves();
     auto chosen = random_joint_move(moves);
 

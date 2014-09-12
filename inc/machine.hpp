@@ -49,7 +49,7 @@ namespace piecemeal {
         turn++;
       }
 
-      bool is_terminal() {
+      bool terminal() {
         return sim.template ask<TERMINAL>(index).size() > 0;
       }
 

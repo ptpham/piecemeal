@@ -34,9 +34,8 @@ int main(int argc, char* argv[]) {
   auto begin = clock();
   for (int i = 0; i < niterations; i++) {
     machine.restart();
-    while (!machine.is_terminal()) {
-      auto chosen = random_joint_move(machine.moves());
-      machine.move(chosen);
+    while (!machine.terminal()) {
+      machine.move(random_joint_move(machine.moves()));
     }
   }
   auto seconds = (double)(clock() - begin)/CLOCKS_PER_SEC;
