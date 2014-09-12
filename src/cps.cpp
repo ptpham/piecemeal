@@ -16,9 +16,6 @@ using namespace piecemeal;
 using namespace logic;
 using namespace game;
 
-typedef uint16_t ltype;
-constexpr size_t pwidth = 8;
-
 int main(int argc, char* argv[]) {
   if (argc < 3) {
     cout << "Usage: ./cps <path to game> <iterations>" << endl;
@@ -29,7 +26,7 @@ int main(int argc, char* argv[]) {
   std::ifstream file(argv[1]);
   size_t niterations = atoi(argv[2]);
   while (std::getline(file, line)) { raw += line; }
-  game::machine<position_index,ltype,pwidth> machine(raw);
+  game::machine<position_index> machine(raw);
 
   auto begin = clock();
   for (int i = 0; i < niterations; i++) {
