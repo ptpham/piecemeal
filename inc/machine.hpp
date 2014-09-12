@@ -5,6 +5,17 @@ namespace piecemeal {
   namespace game {
     using namespace std;
 
+    template <class T, size_t N>
+    vector<prop<T,N>> random_joint_move(
+      const vector<vector<prop<T,N>>>& moves) {
+      vector<prop<T,N>> result(moves.size());
+      for (int i = 0; i < moves.size(); i++) {
+        auto& selected = moves[i][rand() % moves[i].size()];
+        result[i] = selected;
+      }
+      return result;
+    }
+
     template <template <class,size_t> class I, 
       class T = uint16_t, size_t N = 8>
     struct machine {
@@ -26,8 +37,9 @@ namespace piecemeal {
         turn = 0;
       }
 
-      vector<prop<T,N>> moves() {
-        return sim.template ask_convert<DOES,LEGAL>(index);
+      vector<vector<prop<T,N>>> moves() {
+        auto raw = sim.template ask_convert<DOES,LEGAL>(index);
+        return index_by_position(raw, role_map, 1);
       }
 
       void move(const vector<prop<T,N>>& chosen) {

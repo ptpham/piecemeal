@@ -43,22 +43,22 @@ int main(int argc, char* argv[]) {
     cout << "Role '" << hrole << "' invalid." << endl;
     return 1;
   }
-  size_t hrole_index = role_found->second;
+  size_t hrole_index = machine.role_map[role_found->second];
 
   auto& backward = parse.tokens.backward;
   while (!machine.is_terminal()) {
     auto moves = machine.moves();
-    auto chosen = random_joint_move(moves, machine.role_map);
+    auto chosen = random_joint_move(moves);
 
+    auto human_moves = moves[hrole_index];
     cout << "Select move:" << endl;
-    for (size_t i = 0; i < moves.size(); i++) {
-      auto& move = moves[i];
-      if (move[1] != hrole_index) continue;
+    for (size_t i = 0; i < human_moves.size(); i++) {
+      auto& move = human_moves[i];
       cout << i << ") " << human_readable(backward, move) << endl;
     }
     size_t selection;
     cin >> selection;
-    chosen[machine.role_map[hrole_index]] = moves[selection];
+    chosen[hrole_index] = human_moves[selection];
 
     cout << "Playing: ";
     for (auto& move : chosen) {

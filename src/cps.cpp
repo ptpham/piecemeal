@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
   for (int i = 0; i < niterations; i++) {
     machine.restart();
     while (!machine.is_terminal()) {
-      auto chosen = random_joint_move(machine.moves(), machine.role_map);
+      auto chosen = random_joint_move(machine.moves());
       machine.move(chosen);
     }
   }

@@ -28,29 +28,9 @@ namespace piecemeal {
       return { parse, fixture };
     }
 
-    template <class T, size_t N>
-    vector<prop<T,N>> random_joint_move(const vector<prop<T,N>>& moves, const map<T,size_t>& role_map) {
-      size_t nroles = role_map.size();
-      vector<prop<T,N>> result(nroles);
-      size_t seen[nroles];
-
-      fill(seen, seen + nroles, 0);
-      for (auto move : moves) {
-        auto found = role_map.find(move[1]);
-        if (found == role_map.end()) continue;
-        auto index = found->second;
-        if (seen[index] > 0 && rand() % seen[index] > 1) continue;
-        result[index] = move;
-        seen[index]++;
-      }
-      return result;
-    }
-
 #define EXPORT(T,N) \
     template fixture<T,N> build_fixture(unordered_dimap<string>& tokens); \
     template context<T,N> build_context(const string& raw); \
-    template vector<prop<T,N>> random_joint_move( \
-      const vector<prop<T,N>>&moves, const map<T,size_t>& role_map);
 
     EXPORT(uint8_t,8)
     EXPORT(uint16_t,8)

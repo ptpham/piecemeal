@@ -100,10 +100,6 @@ namespace piecemeal {
         return result;
       }
     };
-
-    template <class T, size_t N>
-    vector<prop<T,N>> random_joint_move(const vector<prop<T,N>>& moves,
-      const map<T,size_t>& role_map);
   }
 }
 
