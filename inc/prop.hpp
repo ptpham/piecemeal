@@ -1,8 +1,11 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <numeric>
+#include <vector>
 #include <array>
+#include <map>
 
 #include "hashes.hpp"
 
@@ -29,6 +32,10 @@ namespace piecemeal {
     };
 
     template <class T, size_t N> prop<T,N> invert(const prop<T,N>& trans);
+
+    template <class T, size_t N>
+    vector<vector<prop<T,N>>> index_by_position(const vector<prop<T,N>>& props,
+      const map<T,size_t>& coalesce, size_t position);
   }
 }
 

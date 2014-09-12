@@ -36,18 +36,6 @@ namespace piecemeal {
       return result;
     }
 
-    template <class T, size_t N>
-    prop<T,N> invert(const prop<T,N>& trans) {
-      auto size = *stdaux::max_element_nullable(
-        trans.begin(), trans.end(), prop<T,N>::empty());
-      if (size == prop<T,N>::empty()) return trans;
-      prop<T,N> result;
-      for (T i = 0; i < trans.size(); i++) {
-        if (trans[i] != prop<T,N>::empty()) result[trans[i]] = i;
-      }
-      return result;
-    }
-
     template <class I, class T, size_t N>
     const unordered_set<prop<T,N>>& ask(const I& index, 
       const prop<T,N>& query, askstate<T,N>& state) {
@@ -124,7 +112,6 @@ namespace piecemeal {
     template const unordered_set<prop<T,N>>& ask( \
       const position_index<T,N>& index, const prop<T,N>& query, \
       askstate<T,N>& state); \
-    template prop<T,N> invert(const prop<T,N>&);
 
     EXPORT(uint8_t,8)
     EXPORT(uint16_t,8)

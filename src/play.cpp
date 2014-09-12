@@ -9,15 +9,12 @@
 #include "position_index.hpp"
 #include "stdfmt.hpp"
 
-#include "game.hpp"
+#include "machine.hpp"
 
 using namespace std;
 using namespace piecemeal;
 using namespace logic;
 using namespace game;
-
-typedef uint16_t ltype;
-constexpr size_t pwidth = 8;
 
 template <class T, size_t N>
 string human_readable(const vector<string>& backward, const prop<T,N>& p) {
@@ -37,10 +34,8 @@ int main(int argc, char* argv[]) {
   while (std::getline(file, line)) { raw += line; }
   string hrole = argv[2];
 
-  game::simulator<ltype,pwidth> sim(raw);
-  auto index = sim.create_index<position_index>();
-  auto initial = sim.ask_convert<TRUE, INIT>(index);
-  auto role_map = sim.ask_role_map(index);
+  game::machine<position_index> machine(raw);
+  auto& sim = machine.sim;
 
   auto& parse = sim.context.parse;
   auto role_found = parse.tokens.forward.find(hrole);
@@ -48,14 +43,12 @@ int main(int argc, char* argv[]) {
     cout << "Role '" << hrole << "' invalid." << endl;
     return 1;
   }
-  ltype hrole_index = role_found->second;
+  size_t hrole_index = role_found->second;
 
-  auto state = initial;
   auto& backward = parse.tokens.backward;
-  sim.bind_state(index, state);
-  do {
-    auto moves = sim.ask_convert<DOES, LEGAL>(index);
-    auto chosen = random_joint_move(moves, role_map);
+  while (!machine.is_terminal()) {
+    auto moves = machine.moves();
+    auto chosen = random_joint_move(moves, machine.role_map);
 
     cout << "Select move:" << endl;
     for (size_t i = 0; i < moves.size(); i++) {
@@ -65,7 +58,7 @@ int main(int argc, char* argv[]) {
     }
     size_t selection;
     cin >> selection;
-    chosen[role_map[hrole_index]] = moves[selection];
+    chosen[machine.role_map[hrole_index]] = moves[selection];
 
     cout << "Playing: ";
     for (auto& move : chosen) {
@@ -73,12 +66,11 @@ int main(int argc, char* argv[]) {
     }
     cout << endl;
 
-    index.emplace_props(chosen);
-    state = sim.ask_convert<TRUE, NEXT>(index);
-    sim.bind_state(index, state);
-  } while (sim.ask<TERMINAL>(index).size() == 0);
-  for (auto& goal : sim.ask<GOAL>(index)) cout << human_readable(backward, goal) << endl;
+    machine.move(chosen);
+  }
 
+  auto goals = machine.goals();
+  for (auto& goal : goals) cout << human_readable(backward, goal) << endl;
   return 0;
 }
 
