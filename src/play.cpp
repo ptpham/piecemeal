@@ -34,23 +34,24 @@ int main(int argc, char* argv[]) {
 
   std::string line, raw;
   std::ifstream file(argv[1]);
-  string hrole = argv[2];
   while (std::getline(file, line)) { raw += line; }
+  string hrole = argv[2];
 
   game::simulator<ltype,pwidth> sim(raw);
   auto index = sim.create_index<position_index>();
-  index.emplace_rules(sim.context.parse.rules);
-
-  sim.bind_state(index);
-  auto roles = sim.ask<ROLE>(index);
-  map<ltype,size_t> role_map;
-  for (auto& role : roles) role_map[role[1]] = role_map.size();
-  ltype hrole_index = sim.context.parse.tokens.forward.find(hrole)->second;
+  auto role_map = sim.ask_role_map(index);
   auto initial = sim.ask_convert<TRUE, INIT>(index);
 
-  size_t turn = 0;
+  auto& parse = sim.context.parse;
+  auto role_found = parse.tokens.forward.find(hrole);
+  if (role_found == parse.tokens.forward.end()) {
+    cout << "Role '" << hrole << "' invalid." << endl;
+    return 1;
+  }
+  ltype hrole_index = role_found->second;
+
   auto state = initial;
-  auto& backward = sim.context.parse.tokens.backward;
+  auto& backward = parse.tokens.backward;
   sim.bind_state(index, state);
   do {
     auto moves = sim.ask_convert<DOES, LEGAL>(index);
@@ -75,7 +76,6 @@ int main(int argc, char* argv[]) {
     index.emplace_props(chosen);
     state = sim.ask_convert<TRUE, NEXT>(index);
     sim.bind_state(index, state);
-    turn++;
   } while (sim.ask<TERMINAL>(index).size() == 0);
   for (auto& goal : sim.ask<GOAL>(index)) cout << human_readable(backward, goal) << endl;
 

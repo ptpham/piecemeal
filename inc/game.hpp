@@ -83,7 +83,12 @@ namespace piecemeal {
       }
 
       template <template <class,size_t> class I>
-      I<T,N> create_index() { return I<T,N>(); }
+      I<T,N> create_index() {
+        I<T,N> result;
+        result.emplace_rules(context.parse.rules);
+        bind_state(result);
+        return result;
+      }
 
       template <class I, class S = vector<prop<T,N>>>
       void bind_state(I& index, const S& turn = S()) {
@@ -91,6 +96,14 @@ namespace piecemeal {
         index.emplace_props(context.parse.props);
         index.emplace_props(turn);
         state.clear();
+      }
+
+      template <class I>
+      map<T,size_t> ask_role_map(const I& index) {
+        map<T,size_t> result;
+        auto roles = ask<ROLE>(index);
+        for (auto& role : roles) result[role[1]] = result.size();
+        return result;
       }
     };
 

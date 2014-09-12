@@ -32,13 +32,8 @@ int main(int argc, char* argv[]) {
 
   game::simulator<ltype,pwidth> sim(raw);
   auto index = sim.create_index<position_index>();
-  index.emplace_rules(sim.context.parse.rules);
-
-  sim.bind_state(index);
-  auto roles = sim.ask<ROLE>(index);
-  map<ltype,size_t> role_map;
-  for (auto& role : roles) role_map[role[1]] = role_map.size();
   auto initial = sim.ask_convert<TRUE, INIT>(index);
+  auto role_map = sim.ask_role_map(index);
 
   auto begin = clock();
   for (int i = 0; i < niterations; i++) {
