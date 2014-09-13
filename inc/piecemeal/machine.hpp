@@ -1,4 +1,7 @@
 
+#include <stdint.h>
+#include <stdlib.h>
+
 #include "piecemeal/game.hpp"
 
 namespace piecemeal {
@@ -53,8 +56,16 @@ namespace piecemeal {
         return sim.template ask<TERMINAL>(index).size() > 0;
       }
 
-      unordered_set<prop<T,N>> goals() {
-        return sim.template ask<GOAL>(index);
+      vector<uint16_t> goals() {
+        auto raw = sim.template ask<GOAL>(index);
+        vector<uint16_t> result(role_map.size());
+        auto& backward = sim.context.parse.tokens.backward;
+        for (auto& goal : raw) {
+          auto goal_index = goal[2];
+          if (goal_index >= backward.size()) continue;
+          result[role_map[goal[1]]] = atoi(backward[goal_index].c_str());
+        }
+        return result;
       }
     };
   }

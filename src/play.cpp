@@ -69,8 +69,7 @@ int main(int argc, char* argv[]) {
     machine.move(chosen);
   }
 
-  auto goals = machine.goals();
-  for (auto& goal : goals) cout << human_readable(backward, goal) << endl;
+  cout << "Goals: " << machine.goals() << endl;
   return 0;
 }
 
