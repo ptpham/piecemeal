@@ -3,7 +3,7 @@
 
 #include "ptest.hpp"
 
-#include "dag.hpp"
+#include "piecemeal/dag.hpp"
 
 using namespace piecemeal;
 using namespace dag;

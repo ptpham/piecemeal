@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "dag.hpp"
+#include "piecemeal/dag.hpp"
 
 namespace piecemeal {
   namespace preprocess {

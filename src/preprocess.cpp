@@ -2,8 +2,8 @@
 #include <map>
 #include <iostream>
 
-#include "preprocess.hpp"
-#include "cartesian.hpp"
+#include "piecemeal/preprocess.hpp"
+#include "piecemeal/cartesian.hpp"
 
 using namespace std;
 

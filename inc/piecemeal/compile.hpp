@@ -3,9 +3,9 @@
 
 #include <unordered_set>
 
-#include "unordered_dimap.hpp"
-#include "rule.hpp"
-#include "dag.hpp"
+#include "piecemeal/unordered_dimap.hpp"
+#include "piecemeal/rule.hpp"
+#include "piecemeal/dag.hpp"
 
 namespace piecemeal {
   namespace compile {

@@ -1,5 +1,5 @@
 
-#include "game.hpp"
+#include "piecemeal/game.hpp"
 
 namespace piecemeal {
   namespace game {

@@ -4,12 +4,12 @@
 #include <numeric>
 #include <ctime>
 
-#include "logic.hpp"
-#include "compile.hpp"
-#include "position_index.hpp"
-#include "stdfmt.hpp"
+#include "piecemeal/logic.hpp"
+#include "piecemeal/compile.hpp"
+#include "piecemeal/position_index.hpp"
+#include "piecemeal/stdfmt.hpp"
 
-#include "machine.hpp"
+#include "piecemeal/machine.hpp"
 
 using namespace std;
 using namespace piecemeal;

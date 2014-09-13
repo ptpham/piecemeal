@@ -7,7 +7,7 @@
 #include <array>
 #include <map>
 
-#include "hashes.hpp"
+#include "piecemeal/hashes.hpp"
 
 namespace piecemeal {
   namespace logic {

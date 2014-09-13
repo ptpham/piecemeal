@@ -8,9 +8,9 @@
 
 #include <iostream>
 
-#include "hashes.hpp"
-#include "stdaux.hpp"
-#include "prop.hpp"
+#include "piecemeal/hashes.hpp"
+#include "piecemeal/stdaux.hpp"
+#include "piecemeal/prop.hpp"
 
 namespace piecemeal {
   namespace logic {

@@ -3,7 +3,7 @@
 
 #include "ptest.hpp"
 
-#include "preprocess.hpp"
+#include "piecemeal/preprocess.hpp"
 
 using namespace piecemeal;
 using namespace std;

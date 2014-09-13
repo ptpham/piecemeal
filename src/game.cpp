@@ -1,6 +1,6 @@
 
-#include "game.hpp"
-#include "preprocess.hpp"
+#include "piecemeal/game.hpp"
+#include "piecemeal/preprocess.hpp"
 
 namespace piecemeal {
   namespace game {

@@ -1,6 +1,6 @@
 
 #include "ptest.hpp"
-#include "game.hpp"
+#include "piecemeal/game.hpp"
 
 using namespace piecemeal;
 using namespace stdaux;

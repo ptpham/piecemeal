@@ -4,9 +4,9 @@
 #include <vector>
 #include <unordered_set>
 
-#include "unordered_dimap.hpp"
-#include "compile.hpp"
-#include "logic.hpp"
+#include "piecemeal/unordered_dimap.hpp"
+#include "piecemeal/compile.hpp"
+#include "piecemeal/logic.hpp"
 
 namespace piecemeal {
   namespace game {

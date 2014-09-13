@@ -1,6 +1,6 @@
 
-#include "logic.hpp"
-#include "position_index.hpp"
+#include "piecemeal/logic.hpp"
+#include "piecemeal/position_index.hpp"
 
 #include <iostream>
 using namespace std;

@@ -1,7 +1,7 @@
 
-#include "dag.hpp"
-#include "compile.hpp"
-#include "stdfmt.hpp"
+#include "piecemeal/dag.hpp"
+#include "piecemeal/compile.hpp"
+#include "piecemeal/stdfmt.hpp"
 
 #include "ptest.hpp"
 

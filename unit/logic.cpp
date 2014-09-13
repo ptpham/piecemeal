@@ -1,11 +1,11 @@
 
-#include "dag.hpp"
-#include "logic.hpp"
-#include "preprocess.hpp"
-#include "position_index.hpp"
-#include "compile.hpp"
+#include "piecemeal/dag.hpp"
+#include "piecemeal/logic.hpp"
+#include "piecemeal/preprocess.hpp"
+#include "piecemeal/position_index.hpp"
+#include "piecemeal/compile.hpp"
 
-#include "stdfmt.hpp"
+#include "piecemeal/stdfmt.hpp"
 
 #include "ptest.hpp"
 

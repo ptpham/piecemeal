@@ -1,5 +1,5 @@
-#include "prop.hpp"
-#include "stdaux.hpp"
+#include "piecemeal/prop.hpp"
+#include "piecemeal/stdaux.hpp"
 
 namespace piecemeal {
   namespace logic {

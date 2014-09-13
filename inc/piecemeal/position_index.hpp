@@ -9,7 +9,7 @@
 #include <unordered_set>
 #include <unordered_map>
 
-#include "logic.hpp"
+#include "piecemeal/logic.hpp"
 
 namespace piecemeal {
   namespace logic {
