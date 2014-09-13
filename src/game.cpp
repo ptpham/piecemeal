@@ -1,6 +1,7 @@
 
 #include "piecemeal/game.hpp"
 #include "piecemeal/preprocess.hpp"
+#include "private/logic_export.hpp"
 
 namespace piecemeal {
   namespace game {
@@ -30,10 +31,8 @@ namespace piecemeal {
 
 #define EXPORT(T,N) \
     template fixture<T,N> build_fixture(unordered_dimap<string>& tokens); \
-    template context<T,N> build_context(const string& raw); \
-
-    EXPORT(uint8_t,8)
-    EXPORT(uint16_t,8)
+    template context<T,N> build_context(const string& raw);
+    DEFAULT_LOGIC_EXPORT
 #undef EXPORT
   }
 }

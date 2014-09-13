@@ -1,5 +1,6 @@
 #include "piecemeal/prop.hpp"
 #include "piecemeal/stdaux.hpp"
+#include "private/logic_export.hpp"
 
 namespace piecemeal {
   namespace logic {
@@ -34,9 +35,7 @@ namespace piecemeal {
       const vector<prop<T,N>>& props, const map<T,size_t>& coalesce, \
       size_t position); \
     template prop<T,N> invert(const prop<T,N>&);
-
-    EXPORT(uint8_t,8)
-    EXPORT(uint16_t,8)
+    DEFAULT_LOGIC_EXPORT
 #undef EXPORT
   }
 }

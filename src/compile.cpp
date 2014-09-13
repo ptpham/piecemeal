@@ -1,4 +1,5 @@
 #include "piecemeal/compile.hpp"
+#include "private/logic_export.hpp"
 
 namespace piecemeal {
   namespace compile {
@@ -112,9 +113,7 @@ namespace piecemeal {
 
 #define EXPORT(T,N) \
     template parse<T,N> parse_sentences(dag::cnode<string>);
-
-    EXPORT(uint8_t,8)
-    EXPORT(uint16_t,8)
+    DEFAULT_LOGIC_EXPORT
 #undef EXPORT
   }
 }

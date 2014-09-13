@@ -1,6 +1,7 @@
 
 #include "piecemeal/logic.hpp"
 #include "piecemeal/position_index.hpp"
+#include "private/logic_export.hpp"
 
 #include <iostream>
 using namespace std;
@@ -111,10 +112,8 @@ namespace piecemeal {
 #define EXPORT(T,N) \
     template const unordered_set<prop<T,N>>& ask( \
       const position_index<T,N>& index, const prop<T,N>& query, \
-      askstate<T,N>& state); \
-
-    EXPORT(uint8_t,8)
-    EXPORT(uint16_t,8)
+      askstate<T,N>& state);
+    DEFAULT_LOGIC_EXPORT
 #undef EXPORT
   }
 }
