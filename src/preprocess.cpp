@@ -74,6 +74,8 @@ namespace piecemeal {
             if (child->size() > 1) child = child->at(1);
             else continue;
           }
+          while (child->size() == 1) child = child->at(0);
+          if (child->size() < 1) continue;
           terms.push_back(child);
         }
       }
