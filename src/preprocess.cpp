@@ -1,6 +1,7 @@
 
 #include <map>
 #include <iostream>
+#include <unordered_set>
 
 #include "piecemeal/preprocess.hpp"
 #include "piecemeal/cartesian.hpp"
@@ -65,14 +66,19 @@ namespace piecemeal {
       if (sentences.size() == 0) return;
       map<string, dag::node<string>> index;
       vector<dag::node<string>> terms;
+      unordered_set<string> keywords = { "not", "base", "input"
+        "init", "true", "next", "legal", "does" };
 
       // Gather all terms for iteration
       for (size_t i = 0; i < sentences.size(); i++) {
         for (auto child : *sentences[i]) {
           if (child->size() < 1) continue;
-          if (child->at(0)->value == "not") {
-            if (child->size() > 1) child = child->at(1);
-            else continue;
+          auto& value = child->at(0)->value;
+          if (keywords.find(value) != keywords.end()) {
+            auto child_size = child->size();
+            if (child_size == 2 || child_size== 3) {
+              child = child->at(child_size - 1);
+            } else continue;
           }
           while (child->size() == 1) child = child->at(0);
           if (child->size() < 1) continue;

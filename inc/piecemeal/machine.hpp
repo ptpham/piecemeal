@@ -20,7 +20,7 @@ namespace piecemeal {
     }
 
     template <template <class,size_t> class I, 
-      class T = uint16_t, size_t N = 8>
+      class T = uint16_t, size_t N = 12>
     struct machine {
       game::simulator<T,N> sim;
       map<T,size_t> role_map;
