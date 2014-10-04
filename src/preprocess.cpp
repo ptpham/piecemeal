@@ -2,14 +2,30 @@
 #include <map>
 #include <iostream>
 #include <unordered_set>
+#include <unordered_map>
 
 #include "piecemeal/preprocess.hpp"
 #include "piecemeal/cartesian.hpp"
+
+#include "piecemeal/stdfmt.hpp"
 
 using namespace std;
 
 namespace piecemeal {
   namespace preprocess {
+  
+    vector<string> remove_comments(const vector<string>& raw) {
+      vector<string> result;
+      
+      for (auto& line : raw) {
+        auto index = line.find(';');
+        if (index == -1) result.push_back(line);
+        else result.push_back(line.substr(0, index));
+      }
+      
+      return result;
+    }
+
     vector<dag::node<string>> deor_sentence(dag::node<string> original) {
       vector<vector<dag::node<string>>> space;
       for (auto child : *original) {
@@ -97,8 +113,11 @@ namespace piecemeal {
       }
     }
 
-    dag::node<string> standard(const string& raw) {
-      auto loaded = dag::loads_tree(raw);
+    dag::node<string> standard(const vector<string>& raw) {
+      string concatenated;
+      auto filtered = remove_comments(raw);
+      for (auto& line : filtered) concatenated += line;
+      auto loaded = dag::loads_tree(concatenated);
       auto deorded = deor_sentences(loaded);
       canonize_sentences(*deorded);
       return deorded;

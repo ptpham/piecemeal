@@ -28,7 +28,7 @@ namespace piecemeal {
       I<T,N> index;
       size_t turn;
       
-      machine(const string& raw) : sim(raw),
+      machine(const vector<string>& raw) : sim(raw),
         index(sim.template create_index<position_index>()) {
         role_map = sim.ask_role_map(index);
         restart();

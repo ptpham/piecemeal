@@ -22,10 +22,11 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  std::string line, raw;
+  std::string line;
+  vector<string> raw;
   std::ifstream file(argv[1]);
   size_t niterations = atoi(argv[2]);
-  while (std::getline(file, line)) { raw += line; }
+  while (std::getline(file, line)) { raw.push_back(line); }
   game::machine<position_index> machine(raw);
 
   auto begin = clock();

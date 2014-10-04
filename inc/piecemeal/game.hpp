@@ -43,7 +43,7 @@ namespace piecemeal {
     };
 
     template <class T, size_t N>
-    context<T,N> build_context(const string& raw);
+    context<T,N> build_context(const vector<string>& raw);
 
     template <class T, size_t N>
     struct simulator {
@@ -51,7 +51,7 @@ namespace piecemeal {
       askstate<T,N> state;
 
       simulator() { }
-      simulator(const string& raw) : context(build_context<T,N>(raw)) { }
+      simulator(const vector<string>& raw) : context(build_context<T,N>(raw)) { }
 
       template <keyword K, class I>
       const unordered_set<prop<T,N>>& ask(const I& index) {

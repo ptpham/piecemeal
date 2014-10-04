@@ -22,7 +22,7 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    context<T,N> build_context(const string& raw) {
+    context<T,N> build_context(const vector<string>& raw) {
       auto processed = preprocess::standard(raw);
       auto parse = compile::parse_sentences<T,N>(processed); 
       auto fixture = build_fixture<T,N>(parse.tokens);
@@ -31,7 +31,7 @@ namespace piecemeal {
 
 #define EXPORT(T,N) \
     template fixture<T,N> build_fixture(unordered_dimap<string>& tokens); \
-    template context<T,N> build_context(const string& raw);
+    template context<T,N> build_context(const vector<string>& raw);
     DEFAULT_LOGIC_EXPORT
 #undef EXPORT
   }
