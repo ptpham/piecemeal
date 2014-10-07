@@ -1,11 +1,41 @@
 #include "piecemeal/compile.hpp"
 #include "private/logic_export.hpp"
+#include "piecemeal/stdaux.hpp"
+#include "piecemeal/stdfmt.hpp"
 
 namespace piecemeal {
   namespace compile {
+    template <class T, class F>
+    void node_traversal(T node, F fn) {
+      vector<T> stack = { node };
+      vector<size_t> depths = { 0 };
+      while (stack.size() > 0) {
+        auto next = stack.back();
+        stack.pop_back();
+        auto depth = depths.back();
+        depths.pop_back();
+        fn(next, depth);
+        
+        for(auto i = 0; i < next->size(); i++) {
+          stack.push_back(next->at(next->size() - i - 1));
+          depths.push_back(depth + 1);
+        }
+      }
+    }
+
+    template <class T>
+    vector<T> gather_leaves(T node) {
+      vector<T> result;
+      node_traversal(node, [&](T child, size_t depth) {
+        if (child->size() > 0) return;
+        result.push_back(child);
+      });
+      return result;
+    }
+
     template <class T, size_t N>
     prop<T,N> extract_literal(unordered_dimap<string>& tokens,
-      const vector<dag::cnode<string>>& leaves) {
+      const vector<dag::node<string>>& leaves) {
       prop<T,N> result(0);
       for (size_t i = 0; i < leaves.size(); i++) {
         if (!is_var(leaves[i])) result[i] = tokens.at(leaves[i]->value);
@@ -16,7 +46,7 @@ namespace piecemeal {
 
     template <class T, size_t N>
     prop<T,N> extract_push(unordered_dimap<string>& vars,
-      const vector<dag::cnode<string>>& leaves) {
+      const vector<dag::node<string>>& leaves) {
       prop<T,N> result;
       for (size_t i = 0; i < leaves.size(); i++) {
         if (!is_var(leaves[i])) continue;
@@ -26,15 +56,29 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
+    string recover(const vector<string>& lookup,
+      array<uint8_t,N> depth, prop<T,N> p) {
+      string result; size_t current = 0;
+      for (size_t i = 0; i < N; i++) {
+        while (current < depth[i]) { result += "("; current++; }
+        result += lookup[p[i]];
+        while (current > depth[i]) { result += ")"; current--; }
+        if (i < N - 1 && depth[i + 1] >= current) result += " ";
+      }
+
+      return trim(result);
+    }
+
+    template <class T, size_t N>
     term<T,N> parse_term(unordered_dimap<string>& tokens,
-      unordered_dimap<string>& vars, dag::cnode<string> node) {
-      auto leaves = dag::gather::leaves(node);
+      unordered_dimap<string>& vars, dag::node<string> node) {
+      auto leaves = gather_leaves(node);
       auto head = extract_literal<T,N>(tokens, leaves);
       auto push = extract_push<T,N>(vars, leaves);
       return term<T,N>(head, push, logic::invert(push));
     }
 
-    pair<bool,bool> distinct_var_mask(dag::cnode<string> node) {
+    pair<bool,bool> distinct_var_mask(dag::node<string> node) {
       auto first = node->at(1);
       auto second = node->at(2);
       return make_pair(is_var(first), is_var(second));
@@ -43,7 +87,7 @@ namespace piecemeal {
     template <class T, size_t N>
     void parse_distinct(unordered_dimap<string>& tokens,
       unordered_dimap<string>& vars, rule<T,N>& rule,
-      dag::cnode<string> term) {
+      dag::node<string> term) {
       
       auto mask = distinct_var_mask(term);
       if (!mask.first && !mask.second) return;
@@ -63,21 +107,45 @@ namespace piecemeal {
     }
 
     template <class T, size_t N>
-    void parse_sentence(parse<T,N>& parse, const dag::cnode<string>& child) {
+    array<uint8_t,N> parse_leaf_depth(dag::node<string> node) {
+      array<uint8_t,N> result = stdaux::filled_array<uint8_t,N>(0);
+      size_t last = 0;
+
+      node_traversal(node, [&](dag::node<string> child, size_t depth) {
+        if (child->size() > 0) return;
+        result[last++] = depth;
+      });
+      return result;
+    }
+
+    template <class T, size_t N>
+    void parse_sentence(parse<T,N>& parse, dag::node<string> child) {
       if (child->size() == 0) return;
+      auto& depths = parse.depths;
       rule<T,N> rule;
+
+      // Construct helper function to add the depth structure to the parse
+      auto add_depths = [&](dag::node<string> node, const prop<T,N>& prop) {
+        if (node->size() == 0) node = dag::convert<string>({ node });
+        auto depth = parse_leaf_depth<T,N>(node); 
+        if (depths.find(prop) != depths.end() && depths[prop] != depth) {
+          throw runtime_error("Relation has inconsistent structure " + dag::dumps_tree(node));
+        } depths[prop] = depth;
+      };
 
       // Find and index all variables for a consistent ordering
       unordered_dimap<string> vars;
-      dag::traverse::depth(child, [&](dag::cnode<string> node) {
+      node_traversal(child, [&](dag::node<string> node, size_t depth) {
         if (is_var(node)) vars.at(node->value);
       });
 
       // Relations and propositions will not start with the leading '<='
       if (child->size() == 1 || child->at(0)->value != "<=") {
-        dag::cnode<string> const_child = child;
-        auto leaves = dag::gather::leaves(const_child);
-        parse.props.emplace(extract_literal<T,N>(parse.tokens, leaves));
+        dag::node<string> const_child = child;
+        auto leaves = gather_leaves(const_child);
+        auto extracted = extract_literal<T,N>(parse.tokens, leaves);
+        parse.props.emplace(extracted);
+        add_depths(const_child, extracted);
         return;
       }
 
@@ -98,21 +166,28 @@ namespace piecemeal {
           dst = &rule.negatives;
           term = term->at(1);
         }
-        dst->push_back(parse_term<T,N>(parse.tokens, vars, term));
+
+        auto extracted = parse_term<T,N>(parse.tokens, vars, term);
+        add_depths(term, extracted.literal);
+        dst->push_back(extracted);
       }
 
       parse.rules.push_back(rule);
     }
 
     template <class T, size_t N>
-    parse<T,N> parse_sentences(dag::cnode<string> root) {
+    parse<T,N> parse_sentences(dag::node<string> root) {
       parse<T,N> result;
       for (auto& child : *root) parse_sentence(result, child);
       return result;
     }
 
 #define EXPORT(T,N) \
-    template parse<T,N> parse_sentences(dag::cnode<string>);
+    template term<T,N> parse_term(unordered_dimap<string>& tokens, \
+      unordered_dimap<string>& vars, dag::node<string> node); \
+    template parse<T,N> parse_sentences(dag::node<string>); \
+    template string recover(const vector<string>&, array<uint8_t,N> depth, prop<T,N>);
+
     DEFAULT_LOGIC_EXPORT
 #undef EXPORT
   }

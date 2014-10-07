@@ -2,6 +2,8 @@
 #pragma once
 
 #include <vector>
+#include <string>
+#include <iostream>
 
 namespace std {
   template <class T> T begin(const pair<T,T>& p) { return p.first; }
@@ -30,6 +32,13 @@ namespace piecemeal {
       return largest;
     }
 
+    static inline string trim(const string& s) {
+      size_t begin = s.find_first_not_of(" \t");
+      size_t end = s.find_last_not_of(" \t");
+      if (begin == string::npos) begin = s.length();
+      if (end == string::npos) end = s.length(); else end++;
+      return s.substr(begin, end - begin);
+    }
   }
 }
 

@@ -53,7 +53,7 @@ namespace piecemeal {
       return result;
     }
 
-    void union_structure(dag::node<string>& canon, dag::cnode<string> other) {
+    void union_structure(dag::node<string>& canon, dag::node<string> other) {
       if (other == nullptr) return;
       if (canon == nullptr) canon = dag::wrap(string{});
       while (canon->size() < other->size()) {
@@ -65,7 +65,7 @@ namespace piecemeal {
       }
     }
 
-    void canonize_term(dag::cnode<string> canon, dag::node<string>& other) {
+    void canonize_term(dag::node<string> canon, dag::node<string>& other) {
       if (canon == nullptr) return;
       if (other == nullptr) other = dag::wrap<string>("");
       while (other->size() < canon->size()) {

@@ -16,10 +16,32 @@ static rule<uint8_t,8> run_rule(const string& raw) {
   return scope.rules[0];
 }
 
+TEST(recover_single_mode) {
+  vector<string> lookup = { "", "a", "b", "c" };
+  array<uint8_t,8> depth = { 1, 2, 2 };
+  prop<uint8_t,8> p;
+  iota(p.begin(), p.begin() + 3, 1);
+  ASSERT(recover(lookup, depth, p) == "(a (b c))");
+}
+
+TEST(recover_empty) {
+  vector<string> lookup = { "", "a", "b", "c" };
+  auto depth = stdaux::filled_array<uint8_t,8>(0);
+  prop<uint8_t,8> p;
+  ASSERT(recover(lookup, depth, p) == "");
+}
+
+TEST(recover_prop) {
+  vector<string> lookup = { "", "a", "b", "c" };
+  array<uint8_t,8> depth = { 1 };
+  prop<uint8_t,8> p; p[0] = 1;
+  ASSERT(recover(lookup, depth, p) == "(a)");
+}
+
 TEST(parse_term_no_var) {
   string raw = "(a (b c))";
   unordered_dimap<string> tokens, vars;
-  dag::cnode<string> node = dag::loads_tree(raw);
+  dag::node<string> node = dag::loads_tree(raw);
   auto result = parse_term<uint8_t,8>(tokens, vars, node);
 
   ASSERT(vars.backward.size() == 0);
@@ -34,7 +56,7 @@ TEST(parse_term_no_var) {
 TEST(parse_term_with_var) {
   string raw = "(f (?x ?y))";
   unordered_dimap<string> tokens, vars;
-  dag::cnode<string> node = dag::loads_tree(raw);
+  dag::node<string> node = dag::loads_tree(raw);
   auto result = parse_term<uint8_t,8>(tokens, vars, node);
 
   ASSERT(vars.backward.size() == 2);
