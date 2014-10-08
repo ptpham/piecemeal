@@ -60,9 +60,11 @@ namespace piecemeal {
       array<uint8_t,N> depth, prop<T,N> p) {
       string result; size_t current = 0;
       for (size_t i = 0; i < N; i++) {
+        bool upward = current > depth[i];
         while (current < depth[i]) { result += "("; current++; }
-        result += lookup[p[i]];
         while (current > depth[i]) { result += ")"; current--; }
+        if (upward) result += " ";
+        result += lookup[p[i]];
         if (i < N - 1 && depth[i + 1] >= current) result += " ";
       }
 

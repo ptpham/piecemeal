@@ -16,12 +16,20 @@ static rule<uint8_t,8> run_rule(const string& raw) {
   return scope.rules[0];
 }
 
-TEST(recover_single_mode) {
-  vector<string> lookup = { "", "a", "b", "c" };
-  array<uint8_t,8> depth = { 1, 2, 2 };
+TEST(recover_simple) {
+  vector<string> lookup = { "", "a", "b", "c", "d" };
+  array<uint8_t,8> depth = { 1, 2, 2, 2 };
   prop<uint8_t,8> p;
-  iota(p.begin(), p.begin() + 3, 1);
-  ASSERT(recover(lookup, depth, p) == "(a (b c))");
+  iota(p.begin(), p.begin() + 4, 1);
+  ASSERT(recover(lookup, depth, p) == "(a (b c d))");
+}
+
+TEST(recover_complex) {
+  vector<string> lookup = { "", "a", "b", "c", "d", "e", "f" };
+  array<uint8_t,8> depth = { 1, 2, 2, 1, 2, 3 };
+  prop<uint8_t,8> p;
+  iota(p.begin(), p.begin() + 6, 1);
+  ASSERT(recover(lookup, depth, p) == "(a (b c) d (e (f)))");
 }
 
 TEST(recover_empty) {
