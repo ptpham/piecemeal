@@ -5,6 +5,7 @@
 #include <unordered_set>
 
 #include "piecemeal/unordered_dimap.hpp"
+#include "piecemeal/position_index.hpp"
 #include "piecemeal/compile.hpp"
 #include "piecemeal/logic.hpp"
 
@@ -25,10 +26,9 @@ namespace piecemeal {
       const vector<T> ids;
       const vector<prop<T,N>> queries;
 
-      template <keyword K>
-      prop<T,N> convert(const prop<T,N>& p) const {
+      prop<T,N> convert(const prop<T,N>& p, keyword k) const {
         prop<T,N> result = p;
-        result[0] = ids[K];
+        result[0] = ids[k];
         return result;
       }
     };
@@ -53,27 +53,26 @@ namespace piecemeal {
       simulator() { }
       simulator(const vector<string>& raw) : context(build_context<T,N>(raw)) { }
 
-      template <keyword K, class I>
-      const unordered_set<prop<T,N>>& ask(const I& index) {
-        return logic::ask(index, context.fixture.queries[K], state);
+      template <class I>
+      const unordered_set<prop<T,N>>& ask(const I& index, keyword k) {
+        return logic::ask(index, context.fixture.queries[k], state);
       }
 
-      template <keyword K>
-      prop<T,N> convert(const prop<T,N>& p) const {
-        return context.fixture.template convert<K>(p);
+      prop<T,N> convert(const prop<T,N>& p, keyword k) const {
+        return context.fixture.convert(p, k);
       }
 
-      template <keyword K, class C>
-      vector<prop<T,N>> convert(const C& props) const {
+      template <class C>
+      vector<prop<T,N>> convert(const C& props, keyword k) const {
         vector<prop<T,N>> result;
         result.reserve(props.size());
-        for (auto& p : props) result.push_back(convert<K>(p));
+        for (auto& p : props) result.push_back(convert(p, k));
         return result;
       }
 
-      template <keyword U, keyword V, class I>
-      vector<prop<T,N>> ask_convert(const I& index) {
-        return convert<U>(ask<V>(index));
+      template <class I>
+      vector<prop<T,N>> ask_convert(const I& index, keyword u, keyword v) {
+        return convert(ask(index, v), u);
       }
 
       template <template <class,size_t> class I>
@@ -95,10 +94,33 @@ namespace piecemeal {
       template <class I>
       map<T,size_t> ask_role_map(const I& index) {
         map<T,size_t> result;
-        auto roles = ask<ROLE>(index);
+        auto roles = ask(index, ROLE);
         for (auto& role : roles) result[role[1]] = result.size();
         return result;
       }
+    };
+
+    template <class T, size_t N>
+    vector<prop<T,N>> random_joint_move(
+      const vector<vector<prop<T,N>>>& moves);
+
+    template <class I = position_index<>>
+    struct machine {
+      typedef typename I::prop_type T;
+      static const size_t N = I::prop_size;
+
+      game::simulator<T,N> sim;
+      map<T,size_t> role_map;
+      vector<prop<T,N>> state;
+      size_t turn;
+      I index;
+      
+      machine(const vector<string>& raw);
+      void move(const vector<prop<T,N>>& chosen);
+      vector<vector<prop<T,N>>> moves();
+      vector<uint16_t> goals();
+      bool terminal();
+      void restart();
     };
   }
 }

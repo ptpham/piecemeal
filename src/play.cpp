@@ -4,12 +4,8 @@
 #include <numeric>
 #include <ctime>
 
-#include "piecemeal/logic.hpp"
-#include "piecemeal/compile.hpp"
-#include "piecemeal/position_index.hpp"
+#include "piecemeal/game.hpp"
 #include "piecemeal/stdfmt.hpp"
-
-#include "piecemeal/machine.hpp"
 
 using namespace std;
 using namespace piecemeal;
@@ -35,7 +31,7 @@ int main(int argc, char* argv[]) {
   while (std::getline(file, line)) { raw.push_back(line); }
   string hrole = argv[2];
 
-  game::machine<position_index> machine(raw);
+  game::machine<> machine(raw);
   auto& sim = machine.sim;
 
   auto& parse = sim.context.parse;

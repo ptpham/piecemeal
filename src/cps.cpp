@@ -4,12 +4,8 @@
 #include <numeric>
 #include <ctime>
 
-#include "piecemeal/logic.hpp"
-#include "piecemeal/compile.hpp"
-#include "piecemeal/position_index.hpp"
+#include "piecemeal/game.hpp"
 #include "piecemeal/stdfmt.hpp"
-
-#include "piecemeal/machine.hpp"
 
 using namespace std;
 using namespace piecemeal;
@@ -27,7 +23,7 @@ int main(int argc, char* argv[]) {
   std::ifstream file(argv[1]);
   size_t niterations = atoi(argv[2]);
   while (std::getline(file, line)) { raw.push_back(line); }
-  game::machine<position_index> machine(raw);
+  game::machine<> machine(raw);
 
   auto begin = clock();
   for (int i = 0; i < niterations; i++) {

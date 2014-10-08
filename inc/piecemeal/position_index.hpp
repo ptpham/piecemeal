@@ -14,8 +14,11 @@
 namespace piecemeal {
   namespace logic {
     using namespace std;
-    template <class T, size_t N>
+    template <class T = uint16_t, size_t N = 12>
     struct position_index : vector<knowledge<T,N>> {
+      typedef T prop_type;
+      static const size_t prop_size = N;
+
       const knowledge<T,N> empty = {};
       size_t pos = 0;
 
