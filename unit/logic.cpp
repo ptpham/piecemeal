@@ -24,7 +24,7 @@ static set<prop<uint8_t,8>> run(const string& raw) {
   set<prop<uint8_t,8>> result;
   for (auto& prop : scope.props) ask(index, prop, state);
   for (auto& rule : scope.rules) ask(index, rule.head.literal, state);
-  for (auto& cache : state) for (auto& p : cache.second) result.insert(p);
+  for (auto& cache : state) for (auto& p : cache.second.props) result.insert(p);
   return result;
 }
 

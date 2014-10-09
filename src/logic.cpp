@@ -45,9 +45,10 @@ namespace piecemeal {
 
       // Check in the cache -- this check also serves the purpose of preventing
       // infinite loops on improperly grounded recursive rules
-      auto found = state.find(query);
-      if (found != state.end()) return found->second;
-      auto& result = state[query];
+      auto& entry = state[query];
+      if (entry.active) return entry.props;
+      auto& result = entry.props;
+      entry.active = true;
 
       // If this is a grounded query, we can do a find instead of a filtration
       // on the set of grounds in the known scope. In order to check for a

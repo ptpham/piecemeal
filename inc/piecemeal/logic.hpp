@@ -26,7 +26,16 @@ namespace piecemeal {
     };
 
     template <class T, size_t N>
-    using askstate = unordered_map<prop<T,N>, unordered_set<prop<T,N>>>;
+    struct askentry {
+      unordered_set<prop<T,N>> props;
+      bool active;
+      void clear() { active = false; props.clear(); }
+    };
+
+    template <class T, size_t N>
+    struct askstate : public unordered_map<prop<T,N>, askentry<T,N>> {
+      void clear() { for (auto& elem : *this) elem.second.clear(); }
+    };
 
     template <class I, class T, size_t N>
     const unordered_set<prop<T,N>>& ask(const I& index,
