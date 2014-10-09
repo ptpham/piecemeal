@@ -57,7 +57,7 @@ namespace piecemeal {
 
     template <class T, size_t N>
     string recover(const vector<string>& lookup,
-      array<uint8_t,N> depth, prop<T,N> p) {
+      const prop<T,N>& p, const array<uint8_t,N>& depth) {
       string result; size_t current = 0;
       for (size_t i = 0; i < N; i++) {
         bool upward = current > depth[i];
@@ -188,7 +188,8 @@ namespace piecemeal {
     template term<T,N> parse_term(unordered_dimap<string>& tokens, \
       unordered_dimap<string>& vars, dag::node<string> node); \
     template parse<T,N> parse_sentences(dag::node<string>); \
-    template string recover(const vector<string>&, array<uint8_t,N> depth, prop<T,N>);
+    template string recover(const vector<string>&, const prop<T,N>&, \
+      const array<uint8_t,N>&);
 
     DEFAULT_LOGIC_EXPORT
 #undef EXPORT

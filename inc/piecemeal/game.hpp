@@ -7,7 +7,6 @@
 #include "piecemeal/unordered_dimap.hpp"
 #include "piecemeal/position_index.hpp"
 #include "piecemeal/compile.hpp"
-#include "piecemeal/logic.hpp"
 
 namespace piecemeal {
   namespace game {
@@ -62,6 +61,7 @@ namespace piecemeal {
       I index;
       
       machine(const vector<string>& raw);
+      string recover(const prop<T,N>& p);
 
       void bind_state(const vector<prop<T,N>>& turn = vector<prop<T,N>>());
       unordered_set<prop<T,N>> ask(keyword k);

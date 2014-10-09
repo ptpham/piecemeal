@@ -21,7 +21,7 @@ TEST(recover_simple) {
   array<uint8_t,8> depth = { 1, 2, 2, 2 };
   prop<uint8_t,8> p;
   iota(p.begin(), p.begin() + 4, 1);
-  ASSERT(recover(lookup, depth, p) == "(a (b c d))");
+  ASSERT(recover(lookup, p, depth) == "(a (b c d))");
 }
 
 TEST(recover_complex) {
@@ -29,21 +29,21 @@ TEST(recover_complex) {
   array<uint8_t,8> depth = { 1, 2, 2, 1, 2, 3 };
   prop<uint8_t,8> p;
   iota(p.begin(), p.begin() + 6, 1);
-  ASSERT(recover(lookup, depth, p) == "(a (b c) d (e (f)))");
+  ASSERT(recover(lookup, p, depth) == "(a (b c) d (e (f)))");
 }
 
 TEST(recover_empty) {
   vector<string> lookup = { "", "a", "b", "c" };
   auto depth = stdaux::filled_array<uint8_t,8>(0);
   prop<uint8_t,8> p;
-  ASSERT(recover(lookup, depth, p) == "");
+  ASSERT(recover(lookup, p, depth) == "");
 }
 
 TEST(recover_prop) {
   vector<string> lookup = { "", "a", "b", "c" };
   array<uint8_t,8> depth = { 1 };
   prop<uint8_t,8> p; p[0] = 1;
-  ASSERT(recover(lookup, depth, p) == "(a)");
+  ASSERT(recover(lookup, p, depth) == "(a)");
 }
 
 TEST(parse_term_no_var) {
