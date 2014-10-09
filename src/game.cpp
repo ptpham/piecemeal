@@ -2,6 +2,8 @@
 #include "piecemeal/game.hpp"
 #include "piecemeal/preprocess.hpp"
 #include "piecemeal/position_index.hpp"
+#include "piecemeal/compile.hpp"
+
 #include "private/logic_export.hpp"
 
 namespace piecemeal {
@@ -46,9 +48,23 @@ namespace piecemeal {
       context(build_context<T,N>(raw)) {
       index.emplace_rules(context.parse.rules);
       bind_state();
+      
+      // Extract roles
       auto roles = ask(ROLE);
       for (auto& role : roles) role_map[role[1]] = role_map.size();
+
+      // Make sure we can recover the structure for any prop
+      for (auto& entry : context.parse.depths) {
+        depths[index.parent(entry.first)] = entry.second;
+      }
+
       restart();
+    }
+
+    template <class I>
+    string machine<I>::recover(const prop<T,N>& p) {
+      auto& depth = depths[index.parent(p)];
+      return compile::recover(context.parse.tokens.backward, p, depth);
     }
 
     template <class I>

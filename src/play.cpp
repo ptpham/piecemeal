@@ -12,13 +12,6 @@ using namespace piecemeal;
 using namespace logic;
 using namespace game;
 
-template <class T, size_t N>
-string human_readable(const vector<string>& backward, const prop<T,N>& p) {
-  string result;
-  for (size_t i = 0; i < N; i++) result += backward[p[i]] + " ";
-  return result;
-}
-
 int main(int argc, char* argv[]) {
   if (argc < 3) {
     cout << "Usage: ./cps <path to game> <role>" << endl;
@@ -49,7 +42,7 @@ int main(int argc, char* argv[]) {
     cout << "Select move:" << endl;
     for (size_t i = 0; i < human_moves.size(); i++) {
       auto& move = human_moves[i];
-      cout << i << ") " << human_readable(backward, move) << endl;
+      cout << i << ") " << machine.recover(move) << endl;
     }
     size_t selection;
     cin >> selection;
@@ -57,7 +50,7 @@ int main(int argc, char* argv[]) {
 
     cout << "Playing: ";
     for (auto& move : chosen) {
-      cout << human_readable(backward, move) << " ";
+      cout << machine.recover(move) << " ";
     }
     cout << endl;
 

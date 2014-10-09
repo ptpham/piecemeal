@@ -55,7 +55,10 @@ namespace piecemeal {
 
       context<T,N> context;
       askstate<T,N> askstate;
+
       map<T,size_t> role_map;
+      map<prop<T,N>,array<uint8_t,N>> depths;
+
       vector<prop<T,N>> state;
       size_t turn;
       I index;
