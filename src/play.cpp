@@ -32,9 +32,7 @@ int main(int argc, char* argv[]) {
   string hrole = argv[2];
 
   game::machine<> machine(raw);
-  auto& sim = machine.sim;
-
-  auto& parse = sim.context.parse;
+  auto& parse = machine.context.parse;
   auto role_found = parse.tokens.forward.find(hrole);
   if (role_found == parse.tokens.forward.end()) {
     cout << "Role '" << hrole << "' invalid." << endl;

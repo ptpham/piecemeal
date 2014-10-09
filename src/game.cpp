@@ -42,43 +42,71 @@ namespace piecemeal {
     }
 
     template <class I>
-    machine<I>::machine(const vector<string>& raw) : sim(raw),
-      index(sim.template create_index<position_index>()) {
-      role_map = sim.ask_role_map(index);
+    machine<I>::machine(const vector<string>& raw) : 
+      context(build_context<T,N>(raw)) {
+      index.emplace_rules(context.parse.rules);
+      bind_state();
+      auto roles = ask(ROLE);
+      for (auto& role : roles) role_map[role[1]] = role_map.size();
       restart();
     }
 
     template <class I>
+    void machine<I>::bind_state(const vector<prop<T,N>>& turn) {
+      index.clear_props();
+      index.emplace_props(turn);
+      index.emplace_props(context.parse.props);
+      askstate.clear();
+    }
+
+    template <class I>
+    auto machine<I>::ask_convert(keyword u, keyword v) -> vector<prop<T,N>> {
+      auto props = ask(v);
+      vector<prop<T,N>> result;
+      result.reserve(props.size());
+      for (auto& p : props) {
+        auto converted = context.fixture.convert(p, u);
+        result.push_back(converted);
+      }
+      return result;
+    }
+
+    template <class I>
+    auto machine<I>::ask(keyword k) -> unordered_set<prop<T,N>> {
+      return logic::ask(index, context.fixture.queries[k], askstate);
+    }
+
+    template <class I>
     void machine<I>::restart() {
-      auto state = sim.ask_convert(index, TRUE, INIT);
-      sim.bind_state(index, state);
+      state = ask_convert(TRUE, INIT);
+      bind_state(state);
       turn = 0;
     }
 
     template <class I>
     vector<vector<prop<typename machine<I>::T,machine<I>::N>>> machine<I>::moves() {
-      auto raw = sim.ask_convert(index, DOES, LEGAL);
+      auto raw = ask_convert(DOES, LEGAL);
       return index_by_position(raw, role_map, 1);
     }
 
     template <class I>
     void machine<I>::move(const vector<prop<machine<I>::T,machine<I>::N>>& chosen) {
       index.emplace_props(chosen);
-      state = sim.ask_convert(index, TRUE, NEXT);
-      sim.bind_state(index, state);
+      state = ask_convert(TRUE, NEXT);
+      bind_state(state);
       turn++;
     }
 
     template <class I>
     bool machine<I>::terminal() {
-      return sim.ask(index, TERMINAL).size() > 0;
+      return ask(TERMINAL).size() > 0;
     }
 
     template <class I>
     vector<uint16_t> machine<I>::goals() {
-      auto raw = sim.ask(index, GOAL);
+      auto raw = ask(GOAL);
       vector<uint16_t> result(role_map.size());
-      auto& backward = sim.context.parse.tokens.backward;
+      auto& backward = context.parse.tokens.backward;
       for (auto& goal : raw) {
         auto goal_index = goal[2];
         if (goal_index >= backward.size()) continue;
