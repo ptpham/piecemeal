@@ -57,18 +57,34 @@ namespace piecemeal {
 
     template <class T, size_t N>
     string recover(const vector<string>& lookup,
-      const prop<T,N>& p, const array<uint8_t,N>& depth) {
-      string result; size_t current = 0;
+      prop<T,N> p, array<uint8_t,N> depth) {
+      size_t current = 0, end = 0;
+      string result;
+
+      // Compact the non-empty values of p to the left
+      for (size_t i = 0; i < N; i++) {
+        if (p[i] == prop<T,N>::empty()) p[i] = 0;
+        if (p[i] == 0) { depth[i] = 0; continue; }
+        swap(depth[end], depth[i]);
+        swap(p[end], p[i]);
+        end++;
+      }
+
+      // Generate the string
       for (size_t i = 0; i < N; i++) {
         bool upward = current > depth[i];
         while (current < depth[i]) { result += "("; current++; }
         while (current > depth[i]) { result += ")"; current--; }
+        if (current == 0) break;
+
         if (upward) result += " ";
         result += lookup[p[i]];
         if (i < N - 1 && depth[i + 1] >= current) result += " ";
       }
 
-      return trim(result);
+      // Close all parens
+      while (current > 0) { result += ")"; current--; }
+      return result;
     }
 
     template <class T, size_t N>
@@ -188,8 +204,8 @@ namespace piecemeal {
     template term<T,N> parse_term(unordered_dimap<string>& tokens, \
       unordered_dimap<string>& vars, dag::node<string> node); \
     template parse<T,N> parse_sentences(dag::node<string>); \
-    template string recover(const vector<string>&, const prop<T,N>&, \
-      const array<uint8_t,N>&);
+    template string recover(const vector<string>&, prop<T,N>, \
+      array<uint8_t,N>);
 
     DEFAULT_LOGIC_EXPORT
 #undef EXPORT

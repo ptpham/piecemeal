@@ -40,10 +40,25 @@ TEST(recover_empty) {
 }
 
 TEST(recover_prop) {
-  vector<string> lookup = { "", "a", "b", "c" };
+  vector<string> lookup = { "", "a" };
   array<uint8_t,8> depth = { 1 };
   prop<uint8_t,8> p; p[0] = 1;
   ASSERT(recover(lookup, p, depth) == "(a)");
+}
+
+TEST(recover_extra_depth) {
+  vector<string> lookup = { "", "a" };
+  array<uint8_t,8> depth = { 1, 1, 1, 1, 1  };
+  prop<uint8_t,8> p; p[0] = 1;
+  ASSERT(recover(lookup, p, depth) == "(a)");
+}
+
+TEST(recover_filled) {
+  vector<string> lookup = { "", "a" };
+  auto depth = stdaux::filled_array<uint8_t,8>(1);
+  prop<uint8_t,8> p;
+  fill(p.begin(), p.end(), 1);
+  ASSERT(recover(lookup, p, depth) == "(a a a a a a a a)");
 }
 
 TEST(parse_term_no_var) {

@@ -26,7 +26,7 @@ namespace piecemeal {
 
     template <class T, size_t N>
     string recover(const vector<string>& lookup,
-      const prop<T,N>& p, const array<uint8_t,N>& depth);
+      prop<T,N> p, array<uint8_t,N> depth);
 
     inline static bool is_var(dag::node<string> node) {
       return node->value.size() > 0 && node->value[0] == '?';
