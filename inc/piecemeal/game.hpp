@@ -22,8 +22,8 @@ namespace piecemeal {
 
     template <class T, size_t N>
     struct fixture {
-      const vector<T> ids;
-      const vector<prop<T,N>> queries;
+      vector<T> ids;
+      vector<prop<T,N>> queries;
 
       inline prop<T,N> convert(const prop<T,N>& p, keyword k) const {
         prop<T,N> result = p;
@@ -37,8 +37,9 @@ namespace piecemeal {
 
     template <class T, size_t N>
     struct context {
-      const compile::parse<T,N> parse;
-      const fixture<T,N> fixture;
+      compile::parse<T,N> parse;
+      map<T,size_t> role_map;
+      fixture<T,N> fixture;
     };
 
     template <class T, size_t N>
@@ -55,8 +56,6 @@ namespace piecemeal {
 
       context<T,N> context;
       askstate<T,N> askstate;
-
-      map<T,size_t> role_map;
       map<prop<T,N>,array<uint8_t,N>> depths;
 
       vector<prop<T,N>> state;

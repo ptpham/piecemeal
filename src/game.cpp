@@ -26,10 +26,23 @@ namespace piecemeal {
 
     template <class T, size_t N>
     context<T,N> build_context(const vector<string>& raw) {
+      context<T,N> result;
       auto processed = preprocess::standard(raw);
-      auto parse = compile::parse_sentences<T,N>(processed); 
-      auto fixture = build_fixture<T,N>(parse.tokens);
-      return { parse, fixture };
+      result.parse = compile::parse_sentences<T,N>(processed); 
+      result.fixture = build_fixture<T,N>(result.parse.tokens);
+      
+      // Find the set of role propositions
+      vector<prop<T,N>> roles;
+      for (auto& p : result.parse.props) {
+        if (p[0] != result.fixture.ids[ROLE]) continue;
+        roles.push_back(p);
+      }
+
+      // Map role propositions down to a compact set of integers
+      sort(roles.begin(), roles.end());
+      auto& role_map = result.role_map;
+      for (auto& role : roles) role_map[role[1]] = role_map.size();
+      return result;
     }
 
     template <class T, size_t N>
@@ -48,10 +61,6 @@ namespace piecemeal {
       context(build_context<T,N>(raw)) {
       index.emplace_rules(context.parse.rules);
       bind_state();
-      
-      // Extract roles
-      auto roles = ask(ROLE);
-      for (auto& role : roles) role_map[role[1]] = role_map.size();
 
       // Make sure we can recover the structure for any prop
       for (auto& entry : context.parse.depths) {
@@ -102,7 +111,7 @@ namespace piecemeal {
     template <class I>
     vector<vector<prop<typename machine<I>::T,machine<I>::N>>> machine<I>::moves() {
       auto raw = ask_convert(DOES, LEGAL);
-      return index_by_position(raw, role_map, 1);
+      return index_by_position(raw, context.role_map, 1);
     }
 
     template <class I>
@@ -121,6 +130,7 @@ namespace piecemeal {
     template <class I>
     vector<uint16_t> machine<I>::goals() {
       auto raw = ask(GOAL);
+      auto& role_map = context.role_map;
       vector<uint16_t> result(role_map.size());
       auto& backward = context.parse.tokens.backward;
       for (auto& goal : raw) {

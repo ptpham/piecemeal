@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     cout << "Role '" << hrole << "' invalid." << endl;
     return 1;
   }
-  size_t hrole_index = machine.role_map[role_found->second];
+  size_t hrole_index = machine.context.role_map[role_found->second];
 
   auto& backward = parse.tokens.backward;
   while (!machine.terminal()) {
