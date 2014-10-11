@@ -11,7 +11,7 @@ using namespace piecemeal::logic;
 using namespace piecemeal::compile;
 
 static rule<uint8_t,8> run_rule(const string& raw) {
-  auto parsed = dag::loads_tree(raw);
+  auto parsed = tree::loads(raw);
   auto scope = compile::parse_sentences<uint8_t,8>(parsed);
   return scope.rules[0];
 }
@@ -64,7 +64,7 @@ TEST(recover_filled) {
 TEST(parse_term_no_var) {
   string raw = "(a (b c))";
   unordered_dimap<string> tokens, vars;
-  dag::node<string> node = dag::loads_tree(raw);
+  dag::node<string> node = tree::loads(raw);
   auto result = parse_term<uint8_t,8>(tokens, vars, node);
 
   ASSERT(vars.backward.size() == 0);
@@ -79,7 +79,7 @@ TEST(parse_term_no_var) {
 TEST(parse_term_with_var) {
   string raw = "(f (?x ?y))";
   unordered_dimap<string> tokens, vars;
-  dag::node<string> node = dag::loads_tree(raw);
+  dag::node<string> node = tree::loads(raw);
   auto result = parse_term<uint8_t,8>(tokens, vars, node);
 
   ASSERT(vars.backward.size() == 2);
@@ -93,7 +93,7 @@ TEST(parse_term_with_var) {
 
 TEST(parse_sentence_proposition) {
   auto raw = "((a) (b))";
-  auto parsed = dag::loads_tree(raw);
+  auto parsed = tree::loads(raw);
   auto scope = compile::parse_sentences<uint8_t,8>(parsed);
   ASSERT(scope.rules.size() == 0);
   ASSERT(scope.props.size() == 1);

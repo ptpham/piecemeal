@@ -147,7 +147,7 @@ namespace piecemeal {
         if (node->size() == 0) node = dag::convert<string>({ node });
         auto depth = parse_leaf_depth<T,N>(node); 
         if (depths.find(prop) != depths.end() && depths[prop] != depth) {
-          throw runtime_error("Relation has inconsistent structure " + dag::dumps_tree(node));
+          throw runtime_error("Relation has inconsistent structure " + tree::dumps(node));
         } depths[prop] = depth;
       };
 

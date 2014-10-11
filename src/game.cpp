@@ -73,7 +73,8 @@ namespace piecemeal {
     template <class I>
     string machine<I>::recover(const prop<T,N>& p) {
       auto& depth = depths[index.parent(p)];
-      return compile::recover(context.parse.tokens.backward, p, depth);
+      auto raw = compile::recover(context.parse.tokens.backward, p, depth);
+      return tree::remove_degree_2(raw);
     }
 
     template <class I>

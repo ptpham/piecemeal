@@ -117,7 +117,7 @@ namespace piecemeal {
       string concatenated;
       auto filtered = remove_comments(raw);
       for (auto& line : filtered) concatenated += line;
-      auto loaded = dag::loads_tree(concatenated);
+      auto loaded = tree::loads(concatenated);
       auto deorded = deor_sentences(loaded);
       canonize_sentences(*deorded);
       return deorded;

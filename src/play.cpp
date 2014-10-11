@@ -11,6 +11,7 @@ using namespace std;
 using namespace piecemeal;
 using namespace logic;
 using namespace game;
+using namespace dag;
 
 int main(int argc, char* argv[]) {
   if (argc < 3) {
@@ -41,8 +42,7 @@ int main(int argc, char* argv[]) {
     auto human_moves = moves[hrole_index];
     cout << "Select move:" << endl;
     for (size_t i = 0; i < human_moves.size(); i++) {
-      auto& move = human_moves[i];
-      cout << i << ") " << machine.recover(move) << endl;
+      cout << i << ") " << machine.recover(human_moves[i]) << endl;
     }
     size_t selection;
     cin >> selection;

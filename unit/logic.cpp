@@ -14,7 +14,7 @@ using namespace piecemeal;
 using namespace piecemeal::logic;
 
 static set<prop<uint8_t,8>> run(const string& raw) {
-  auto parsed = dag::loads_tree(raw);
+  auto parsed = tree::loads(raw);
   auto scope = compile::parse_sentences<uint8_t,8>(parsed);
   logic::position_index<uint8_t, 8> index;
   index.emplace_rules(scope.rules);
