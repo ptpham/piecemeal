@@ -64,7 +64,10 @@ namespace piecemeal {
 
       // Make sure we can recover the structure for any prop
       for (auto& entry : context.parse.depths) {
-        depths[index.parent(entry.first)] = entry.second;
+        auto& current = depths[index.parent(entry.first)];
+        for (size_t i = 0; i < N; i++) {
+           current[i] = max(entry.second[i], current[i]);
+        }
       }
 
       restart();
