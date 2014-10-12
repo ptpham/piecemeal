@@ -137,9 +137,11 @@ namespace piecemeal {
       auto add_depths = [&](dag::node<string> node, const prop<T,N>& prop) {
         if (node->size() == 0) node = dag::convert<string>({ node });
         auto depth = parse_leaf_depth<T,N>(node); 
-        if (depths.find(prop) != depths.end() && depths[prop] != depth) {
+        auto id = prop[0];
+
+        if (depths.find(id) != depths.end() && depths[id] != depth) {
           throw runtime_error("Relation has inconsistent structure " + tree::dumps(node));
-        } depths[prop] = depth;
+        } depths[id] = depth;
       };
 
       // Find and index all variables for a consistent ordering

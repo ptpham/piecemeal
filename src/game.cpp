@@ -61,21 +61,12 @@ namespace piecemeal {
       context(build_context<T,N>(raw)) {
       index.emplace_rules(context.parse.rules);
       bind_state();
-
-      // Make sure we can recover the structure for any prop
-      for (auto& entry : context.parse.depths) {
-        auto& current = depths[index.parent(entry.first)];
-        for (size_t i = 0; i < N; i++) {
-           current[i] = max(entry.second[i], current[i]);
-        }
-      }
-
       restart();
     }
 
     template <class I>
     string machine<I>::recover(const prop<T,N>& p) {
-      auto& depth = depths[index.parent(p)];
+      auto& depth = context.parse.depths[p[0]];
       auto raw = compile::recover(context.parse.tokens.backward, p, depth);
       return tree::remove_degree_2(raw);
     }

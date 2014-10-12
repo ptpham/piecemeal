@@ -93,3 +93,7 @@ TEST(ask_var_recursive_ungrounded) {
   ASSERT(run("(p a b) (<= (q ?y) (q ?x) (p ?x ?y))").size() == 1);
 }
 
+TEST(ask_var_structure_varied) {
+  ASSERT(run("(p a) (p (a b)) (<= (q ?x) (p ?x))").size() == 4);
+}
+

@@ -18,7 +18,7 @@ namespace piecemeal {
     struct parse {
       unordered_dimap<string> tokens;
       unordered_set<prop<T,N>> props;
-      map<prop<T,N>,array<uint8_t,N>> depths;
+      map<T,array<uint8_t,N>> depths;
       vector<rule<T,N>> rules;
 
       parse() { tokens.at(""); }
