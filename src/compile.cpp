@@ -61,16 +61,25 @@ namespace piecemeal {
       size_t current = 0, end = 0;
       string result;
 
+      // Compact the non-empty values of p to the left
+      for (size_t i = 0; i < N; i++) {
+        if (p[i] == prop<T,N>::empty()) p[i] = 0;
+        if (p[i] == 0) { depth[i] = 0; continue; }
+        swap(depth[end], depth[i]);
+        swap(p[end], p[i]);
+        end++;
+      }
+
       // Generate the string
       for (size_t i = 0; i < N; i++) {
         bool upward = current > depth[i];
         while (current < depth[i]) { result += "("; current++; }
         while (current > depth[i]) { result += ")"; current--; }
+        if (current == 0) break;
 
-        bool valid_next = i < N - 1 && p[i+1] != 0 && p[i+1] != prop<T,N>::empty();
-        if (valid_next && upward) result += " ";
+        if (upward) result += " ";
         result += lookup[p[i]];
-        if (valid_next && depth[i + 1] >= current) result += " ";
+        if (i < N - 1 && depth[i + 1] >= current) result += " ";
       }
 
       // Close all parens
