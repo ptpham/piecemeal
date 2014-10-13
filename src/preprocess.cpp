@@ -6,6 +6,7 @@
 
 #include "piecemeal/preprocess.hpp"
 #include "piecemeal/cartesian.hpp"
+#include "piecemeal/compile.hpp"
 
 #include "piecemeal/stdfmt.hpp"
 
@@ -53,63 +54,87 @@ namespace piecemeal {
       return result;
     }
 
-    void union_structure(dag::node<string>& canon, dag::node<string> other) {
-      if (other == nullptr) return;
-      if (canon == nullptr) canon = dag::wrap(string{});
-      while (canon->size() < other->size()) {
-        auto target = other->at(canon->size());
-        canon->push_back(dag::wrap(string{}));
+    vector<dag::node<string>> extract_relations(dag::node<string> sentence) {
+      vector<shared_ptr<dag::elem<string>>> iteration = *sentence;
+      vector<dag::node<string>> result;
+      if (sentence->size() == 0) return result;
+      if (sentence->at(0)->value != "<=") iteration = { sentence };
+      for (auto child : iteration) {
+        if (child->size() < 1) continue;
+        auto& value = child->at(0)->value;
+        if (value == "not") child = child->at(1);
+        if (child->size() == 0) continue;
+        result.push_back(child);
       }
-      for (size_t i = 0; i < other->size(); i++) {
-        union_structure(canon->at(i), other->at(i));
-      }
+      return result;
     }
 
-    void canonize_term(dag::node<string> canon, dag::node<string>& other) {
-      if (canon == nullptr) return;
+    map<string,dag::node<string>> canonize_term(dag::node<string> canon,
+      dag::node<string>& other) {
+      map<string,dag::node<string>> result;
+
+      if (canon == nullptr) return result;
       if (other == nullptr) other = dag::wrap<string>("");
+      size_t original_size = other->size();
+
       while (other->size() < canon->size()) {
-        auto created = dag::wrap<string>(other->value);
-        if (other->size() + 1 == canon->size()) other->push_back(created);
-        else other->push_back(dag::wrap<string>(""));
+        bool is_var = compile::is_var(other);
+        string value = (is_var || original_size == other->size())
+          ? other->value : "";
+
+        if (is_var && value != "") result[value] = canon;
+        if (is_var) value += ":" + to_string(other->size());
+        other->push_back(dag::wrap<string>(value));
       }
-      for (size_t i = 0; i < other->size(); i++) {
-        canonize_term(canon->at(i), other->at(i));
+
+      for (size_t i = 0; i < other->size() && i < canon->size(); i++) {
+        for (auto& entry : canonize_term(canon->at(i), other->at(i))) {
+          result.insert(entry);
+        }
       }
+
+      return result;
+    }
+
+    void apply_expansion(const map<string,dag::node<string>>& expansions, 
+      dag::node<string> node) {
+      auto found = expansions.find(node->value);
+      if (found != expansions.end()) canonize_term(found->second, node);
+      else for (auto& child : *node) apply_expansion(expansions, child);
     }
 
     void canonize_sentences(const vector<dag::node<string>>& sentences) {
       if (sentences.size() == 0) return;
       map<string, dag::node<string>> index;
-      vector<dag::node<string>> terms;
-      unordered_set<string> keywords = { "not", "base", "input"
-        "init", "true", "next", "legal", "does" };
+      bool changed = true;
 
-      // Gather all terms for iteration
-      for (size_t i = 0; i < sentences.size(); i++) {
-        for (auto child : *sentences[i]) {
-          if (child->size() < 1) continue;
-          auto& value = child->at(0)->value;
-          if (keywords.find(value) != keywords.end()) {
-            auto child_size = child->size();
-            if (child_size == 2 || child_size== 3) {
-              child = child->at(child_size - 1);
-            } else continue;
+      while (changed) {
+        changed = false;
+
+        // Construct canonical versions of each relation globally
+        for (auto sentence : sentences) {
+          for (auto term : extract_relations(sentence)) {
+            canonize_term(term, index[term->at(0)->value]);
           }
-          while (child->size() == 1) child = child->at(0);
-          if (child->size() < 1) continue;
-          terms.push_back(child);
         }
-      }
 
-      // Construct canonical versions of each relation
-      for (auto term : terms) {
-        union_structure(index[term->at(0)->value], term);
-      }
+        // Canonize relations in all sentences
+        for (auto sentence : sentences) {
+          map<string,dag::node<string>> expansions;
+          for (auto term : extract_relations(sentence)) {
+            for(auto& entry : canonize_term(index[term->at(0)->value], term)) {
+              expansions.insert(entry);
+            }
+          }
 
-      // Canonize all relations in all sentences
-      for (auto term : terms) {
-        canonize_term(index[term->at(0)->value], term);
+          // Transfer expansions of variables to all relations in the sentence
+          if (expansions.size() == 0) continue;
+          for (auto term : extract_relations(sentence)) {
+            apply_expansion(expansions, term);      
+          }
+
+          changed = true;
+        }
       }
     }
 

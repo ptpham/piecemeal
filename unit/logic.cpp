@@ -14,7 +14,7 @@ using namespace piecemeal;
 using namespace piecemeal::logic;
 
 static set<prop<uint8_t,8>> run(const string& raw) {
-  auto parsed = tree::loads(raw);
+  auto parsed = preprocess::standard({raw});
   auto scope = compile::parse_sentences<uint8_t,8>(parsed);
   logic::position_index<uint8_t, 8> index;
   index.emplace_rules(scope.rules);
@@ -94,6 +94,9 @@ TEST(ask_var_recursive_ungrounded) {
 }
 
 TEST(ask_var_structure_varied) {
-  ASSERT(run("(p a) (p (a b)) (<= (q ?x) (p ?x))").size() == 4);
+  ASSERT(run("(p a) (p (b c)) (<= (q ?x) (p ?x))").size() == 4);
 }
 
+TEST(ask_var_structure_varied_chained) {
+  ASSERT(run("(p a) (p (b c)) (<= (r ?y) (q ?y)) (<= (q ?x) (p ?x))").size() == 6);
+}

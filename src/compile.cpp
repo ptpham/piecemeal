@@ -2,6 +2,7 @@
 #include "private/logic_export.hpp"
 #include "piecemeal/stdaux.hpp"
 #include "piecemeal/stdfmt.hpp"
+#include "piecemeal/logic.hpp"
 
 namespace piecemeal {
   namespace compile {
