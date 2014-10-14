@@ -76,15 +76,16 @@ namespace piecemeal {
         bool upward = current > depth[i];
         while (current < depth[i]) { result += "("; current++; }
         while (current > depth[i]) { result += ")"; current--; }
-        if (current == 0) break;
 
-        if (upward) result += " ";
+        bool valid_next = i < N - 1 && p[i+1] != 0 && p[i+1] != prop<T,N>::empty();
+        if (valid_next && upward) result += " ";
         result += lookup[p[i]];
-        if (i < N - 1 && depth[i + 1] >= current) result += " ";
+        if (valid_next && depth[i + 1] >= current) result += " ";
       }
 
       // Close all parens
       while (current > 0) { result += ")"; current--; }
+      if (result.size() > 0 && result[0] != '(') result = "(" + result + ")";
       return result;
     }
 

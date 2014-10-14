@@ -39,9 +39,16 @@ TEST(recover_empty) {
   ASSERT(recover(lookup, p, depth) == "");
 }
 
-TEST(recover_prop) {
+TEST(recover_prop_deep) {
   vector<string> lookup = { "", "a" };
   array<uint8_t,8> depth = { 1 };
+  prop<uint8_t,8> p; p[0] = 1;
+  ASSERT(recover(lookup, p, depth) == "(a)");
+}
+
+TEST(recover_prop_shallow) {
+  vector<string> lookup = { "", "a" };
+  array<uint8_t,8> depth = { };
   prop<uint8_t,8> p; p[0] = 1;
   ASSERT(recover(lookup, p, depth) == "(a)");
 }
