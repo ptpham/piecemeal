@@ -91,7 +91,7 @@ namespace piecemeal {
 
             auto prop = transfer(head.literal, head.push, current);
             if (!prop.is_grounded()) return;
-            result.emplace(prop);
+            if (check_conflict(query, prop)) result.emplace(prop);
           } else {
             auto& positive = rule.positives[i];
             auto next = transfer(positive.literal, positive.push, current);

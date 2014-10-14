@@ -48,6 +48,18 @@ TEST(ask_prop_distinct_success) {
   ASSERT(run("(<= a (distinct b c))").size() == 1);
 }
 
+TEST(ask_vacuous_rule) {
+  ASSERT(run("(<= a)").size() == 1);
+}
+
+TEST(ask_var_conflict_on_permanent) {
+  ASSERT(run("(r a b) (<= (q ?x c) (r ?x c))").size() == 1);
+}
+
+TEST(ask_var_conflict_on_deduction) {
+  ASSERT(run("(<= (r a b)) (<= (q ?x c) (r ?x c))").size() == 1);
+}
+
 TEST(ask_var_positive) {
   ASSERT(run("(p a) (<= (q ?x) (p ?x))").size() == 2);
 }
