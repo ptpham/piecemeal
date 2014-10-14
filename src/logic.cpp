@@ -76,6 +76,9 @@ namespace piecemeal {
         function<void (decltype(space),size_t)> satisfy =
           [&](decltype(space) current, size_t i) {
           if (i == rule.positives.size()) {
+            auto prop = transfer(head.literal, head.push, current);
+            if (!prop.is_grounded() || !check_conflict(query,prop)) return;
+
             for (auto& distinct : rule.distincts) {
               if (current[distinct.first] == current[distinct.second]) return;
             }
@@ -89,9 +92,7 @@ namespace piecemeal {
               if (ask(index, next, state).size() > 0) return;
             }
 
-            auto prop = transfer(head.literal, head.push, current);
-            if (!prop.is_grounded()) return;
-            if (check_conflict(query, prop)) result.emplace(prop);
+            result.emplace(prop);
           } else {
             auto& positive = rule.positives[i];
             auto next = transfer(positive.literal, positive.push, current);
