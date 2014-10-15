@@ -34,11 +34,11 @@ namespace piecemeal {
 
     template <class T, size_t N>
     prop<T,N> extract_literal(unordered_dimap<string>& tokens,
-      const vector<dag::node<string>>& leaves);
+      dag::node<string> leaves);
 
     template <class T, size_t N>
     prop<T,N> extract_push(const unordered_map<string,size_t>& vars,
-      const vector<dag::node<string>>& leaves);
+      dag::node<string> leaves);
 
     template <class T, size_t N>
     term<T,N> parse_term(unordered_dimap<string>& tokens,

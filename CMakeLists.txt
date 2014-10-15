@@ -9,8 +9,12 @@ add_executable(test_unit dep/ptest/ptest_main
   unit/logic unit/compile unit/game unit/preprocess unit/dag)
 target_link_libraries(test_unit piecemeal)
 
-add_executable(cps src/cps.cpp)
+add_executable(cps src/cps)
 target_link_libraries(cps piecemeal)
 
-add_executable(play src/play.cpp)
+add_executable(play src/play)
 target_link_libraries(play piecemeal)
+
+add_executable(piecelog src/piecelog)
+target_link_libraries(piecelog piecemeal)
+

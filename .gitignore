@@ -6,5 +6,6 @@ cmake_install.cmake
 *.a
 *.so
 test_*
+piecelog
 play
 cps

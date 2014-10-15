@@ -36,8 +36,10 @@ namespace piecemeal {
 
     template <class T, size_t N>
     prop<T,N> extract_literal(unordered_dimap<string>& tokens,
-      const vector<dag::node<string>>& leaves) {
+      dag::node<string> node) {
       prop<T,N> result(0);
+
+      auto leaves = gather_leaves(node);
       for (size_t i = 0; i < leaves.size(); i++) {
         if (!is_var(leaves[i])) result[i] = tokens.at(leaves[i]->value);
         else result[i] = prop<T,N>::empty();
@@ -47,8 +49,10 @@ namespace piecemeal {
 
     template <class T, size_t N>
     prop<T,N> extract_push(unordered_dimap<string>& vars,
-      const vector<dag::node<string>>& leaves) {
+      dag::node<string> node) {
       prop<T,N> result;
+
+      auto leaves = gather_leaves(node);
       for (size_t i = 0; i < leaves.size(); i++) {
         if (!is_var(leaves[i])) continue;
         result[i] = vars.at(leaves[i]->value);
@@ -92,9 +96,8 @@ namespace piecemeal {
     template <class T, size_t N>
     term<T,N> parse_term(unordered_dimap<string>& tokens,
       unordered_dimap<string>& vars, dag::node<string> node) {
-      auto leaves = gather_leaves(node);
-      auto head = extract_literal<T,N>(tokens, leaves);
-      auto push = extract_push<T,N>(vars, leaves);
+      auto head = extract_literal<T,N>(tokens, node);
+      auto push = extract_push<T,N>(vars, node);
       return term<T,N>(head, push, logic::invert(push));
     }
 
@@ -163,11 +166,9 @@ namespace piecemeal {
 
       // Relations and propositions will not start with the leading '<='
       if (child->size() == 1 || child->at(0)->value != "<=") {
-        dag::node<string> const_child = child;
-        auto leaves = gather_leaves(const_child);
-        auto extracted = extract_literal<T,N>(parse.tokens, leaves);
+        auto extracted = extract_literal<T,N>(parse.tokens, child);
         parse.props.emplace(extracted);
-        add_depths(const_child, extracted);
+        add_depths(child, extracted);
         return;
       }
 

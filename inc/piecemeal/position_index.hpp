@@ -16,8 +16,8 @@ namespace piecemeal {
     using namespace std;
     template <class _T = uint16_t, size_t _N = 12>
     struct position_index : vector<knowledge<_T,_N>> {
-      typedef _T T;
       static const size_t N = _N;
+      typedef _T T;
 
       const knowledge<T,N> empty = {};
       size_t pos = 0;
