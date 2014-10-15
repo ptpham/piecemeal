@@ -6,6 +6,7 @@
 
 #include "piecemeal/game.hpp"
 #include "piecemeal/stdfmt.hpp"
+#include "piecemeal/ioaux.hpp"
 
 using namespace std;
 using namespace piecemeal;
@@ -18,12 +19,8 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  std::string line;
-  vector<string> raw;
-  std::ifstream file(argv[1]);
   size_t niterations = atoi(argv[2]);
-  while (std::getline(file, line)) { raw.push_back(line); }
-  game::machine<> machine(raw);
+  game::machine<> machine(ioaux::read_all(argv[1]));
 
   auto begin = clock();
   for (int i = 0; i < niterations; i++) {

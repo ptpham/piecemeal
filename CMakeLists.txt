@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_CXX_FLAGS "-std=c++11 -g -O3")
 
 include_directories(inc dep/ptest)
-add_library(piecemeal src/logic src/dag src/compile src/preprocess src/game src/prop)
+add_library(piecemeal src/logic src/dag src/compile src/preprocess
+  src/game src/prop src/ioaux)
 
 add_executable(test_unit dep/ptest/ptest_main
   unit/logic unit/compile unit/game unit/preprocess unit/dag)

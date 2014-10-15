@@ -6,6 +6,7 @@
 
 #include "piecemeal/game.hpp"
 #include "piecemeal/stdfmt.hpp"
+#include "piecemeal/ioaux.hpp"
 
 using namespace std;
 using namespace piecemeal;
@@ -19,13 +20,8 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  std::string line;
-  vector<string> raw;
-  std::ifstream file(argv[1]);
-  while (std::getline(file, line)) { raw.push_back(line); }
   string hrole = argv[2];
-
-  game::machine<> machine(raw);
+  game::machine<> machine(ioaux::read_all(argv[1]));
   auto& parse = machine.context.parse;
   auto role_found = parse.tokens.forward.find(hrole);
   if (role_found == parse.tokens.forward.end()) {
