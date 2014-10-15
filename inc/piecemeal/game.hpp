@@ -51,8 +51,8 @@ namespace piecemeal {
 
     template <class I = position_index<>>
     struct machine {
-      typedef typename I::prop_type T;
-      static const size_t N = I::prop_size;
+      typedef typename I::T T;
+      static const size_t N = I::N;
 
       context<T,N> context;
       askstate<T,N> askstate;
