@@ -152,7 +152,7 @@ namespace piecemeal {
         if (node->size() == 0) node = dag::convert<string>({ node });
         auto depth = parse_leaf_depth<T,N>(node); 
         auto id = prop[0];
-
+        
         if (depths.find(id) != depths.end() && depths[id] != depth) {
           throw runtime_error("Relation has inconsistent structure " + tree::dumps(node));
         } depths[id] = depth;
@@ -172,8 +172,11 @@ namespace piecemeal {
         return;
       }
 
-      // Extract head and various body terms for full rules
+      // Extract head
       rule.head = parse_term<T,N>(parse.tokens, vars, child->at(1));
+      add_depths(child->at(1), rule.head.literal);
+
+      // Extract body terms
       for (size_t i = 2; i < child->size(); i++) {
         auto term = child->at(i);
 
