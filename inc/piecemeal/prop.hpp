@@ -18,6 +18,10 @@ namespace piecemeal {
       prop(T value) { fill(this->begin(), this->end(), value); }
       prop() : prop(empty()) { }
 
+      prop(const prop& other) {
+        for (size_t i = 0; i < N; i++) (*this)[i] = other[i];
+      }
+
       bool is_blank() const {
         for (auto v : *this) if (v != empty()) return false;
         return true;
