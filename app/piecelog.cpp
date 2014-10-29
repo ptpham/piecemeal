@@ -18,9 +18,13 @@ using namespace logic;
 
 int main(int argc, char* argv[]) {
   if (argc < 2) {
-    cout << "Usage: ./piecelog <paths to kif>... " << endl;
+    cout << "Usage: ./piecelog [-n <# of code lines>] <paths to kif>... " << endl;
     return 1;
   }
+
+  string arg2(argv[1]);
+  size_t num_code_lines = 0;
+  if (arg2 == "-n" && argc > 2) num_code_lines = strtol(argv[2], NULL, 0);
 
   position_index<> index;
   const size_t N = position_index<>::N;
@@ -33,10 +37,15 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  string line;
+  for (size_t i = 0; i < num_code_lines; i++) {
+    getline(cin, line);  
+    all_code.push_back(line);
+  }
+
   auto processed = preprocess::standard(all_code);
   auto parse = compile::parse_sentences<T,N>(processed);
   index.emplace_rules(parse.rules);
-  string line;
 
   while (true) {
     getline(cin, line);
@@ -57,7 +66,6 @@ int main(int argc, char* argv[]) {
       query[0] = i;
 
       for (auto& p : logic::ask(index, query, askstate)) {
-        if (knowledge.props.find(p) != knowledge.props.end()) continue;
         cout << compile::recover(parse.tokens.backward, p, parse.depths[p[0]]) << " ";
       }
     }
