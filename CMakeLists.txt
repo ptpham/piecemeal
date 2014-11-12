@@ -18,3 +18,5 @@ target_link_libraries(play piecemeal)
 add_executable(piecelog app/piecelog)
 target_link_libraries(piecelog piecemeal)
 
+add_executable(piecemill app/piecemill)
+target_link_libraries(piecemill piecemeal)

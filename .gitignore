@@ -7,6 +7,7 @@ cmake_install.cmake
 *.so
 test_*
 piecelog
+piecemill
 play
 cps
 .DS_Store
