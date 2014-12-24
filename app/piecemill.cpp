@@ -20,7 +20,7 @@ const size_t N = 12;
 
 struct task {
   vector<string> values;
-  list<string> unprocessed;
+  list<pair<string,string>> unprocessed;
   piecelog::parse<T,N> parse;
   string command, prefix;
   bool working;
@@ -84,12 +84,14 @@ int main(int argc, char* argv[]) {
 
     lock_guard<mutex> guard(gmutex);
     auto& cur = frames[prefix]; 
-    cur->unprocessed.push_back(move(line));
+    cur->unprocessed.push_back({command, move(line)});
     if (cur->working) continue;
 
     auto& unprocessed = cur->unprocessed;
     while (unprocessed.size() > 0) {
-      auto line = move(unprocessed.front());
+      auto& pair = unprocessed.front();
+      auto command = move(pair.first);
+      auto line = move(pair.second);
       unprocessed.pop_front();
 
       if (command == "add") {
