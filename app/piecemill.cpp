@@ -1,4 +1,23 @@
 
+/*
+Piecemill was intended to provide multithreaded prover functionality to another
+process through the standard io streams to avoid needing a language specific
+binding. All commands must be prefixed by some string indicating the "game
+instance". "add" provides kif lines into a buffer. "build" compiles the
+previously added lines into a game. "ask" uses previous lines as inputs into
+the prover using the specified game instance. "done" will delete/clean up the
+instance. Here's an example input sequence:
+
+1 add (<= (next ?x) (true ?x))
+1 build
+1 add (true a)
+1 ask
+
+The last output you should see is the following note that it also returns the
+inputs you give it:
+1 (next a) (true a)
+*/
+
 #include <functional>
 #include <iostream>
 #include <string>
